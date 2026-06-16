@@ -1306,6 +1306,13 @@ func (x Uint32x4) MulWidenLo(y Uint32x4) Uint64x2
 // Asm: VFNEG, CPU Feature: NEON
 func (x Float32x4) Neg() Float32x4
 
+// Reverse64 reverses the two 32-bit elements within each 64-bit lane of x.
+// For x = [x0,x1,x2,x3], result = [x1,x0,x3,x2] — the re/im swap of two packed
+// complex values.
+//
+// Asm: VREV64, CPU Feature: NEON
+func (x Float32x4) Reverse64() Float32x4
+
 // Neg returns the elementwise negation of x.
 //
 // Asm: VFNEG, CPU Feature: NEON

@@ -785,6 +785,7 @@ func simdGenericOps() []opData {
 		{name: "MulWidenLoUint16x8", argLength: 2, commutative: true},                   // ARCH:arm64,wasm
 		{name: "MulWidenLoUint32x4", argLength: 2, commutative: true},                   // ARCH:arm64,wasm
 		{name: "NegFloat32x4", argLength: 1},                                            // ARCH:arm64,wasm
+		{name: "Reverse64Float32x4", argLength: 1},                                      // ARCH:arm64
 		{name: "NegFloat64x2", argLength: 1},                                            // ARCH:arm64,wasm
 		{name: "NegInt8x16", argLength: 1},                                              // ARCH:arm64,wasm
 		{name: "NegInt16x8", argLength: 1},                                              // ARCH:arm64,wasm

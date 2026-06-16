@@ -254,6 +254,7 @@
 (MulWidenLoUint16x8 ...) => (VUMULL8H ...) // pureVreg
 (MulWidenLoUint32x4 ...) => (VUMULL4S ...) // pureVreg
 (NegFloat32x4 ...) => (VFNEG4S ...) // pureVreg
+(Reverse64Float32x4 ...) => (VREV644S ...) // pureVreg
 (NegFloat64x2 ...) => (VFNEG2D ...) // pureVreg
 (NegInt8x16 ...) => (VNEG16B ...) // pureVreg
 (NegInt16x8 ...) => (VNEG8H ...) // pureVreg
