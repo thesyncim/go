@@ -5101,6 +5101,7 @@ const (
 	OpARM64VNEG4S
 	OpARM64VNEG8H
 	OpARM64VNEG16B
+	OpARM64VREV644S
 	OpARM64VNOT16B
 	OpARM64VORN16B
 	OpARM64VORR16B
@@ -7984,6 +7985,7 @@ const (
 	OpMulWidenLoUint16x8
 	OpMulWidenLoUint32x4
 	OpNegFloat32x4
+	OpReverse64Float32x4
 	OpNegFloat64x2
 	OpNegInt8x16
 	OpNegInt16x8
@@ -81220,6 +81222,19 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
+		name:   "VREV644S",
+		argLen: 1,
+		asm:    arm64.AVREV64,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		name:   "VNOT16B",
 		argLen: 1,
 		asm:    arm64.AVNOT,
@@ -111250,6 +111265,11 @@ var opcodeTable = [...]opInfo{
 	},
 	{
 		name:    "NegFloat32x4",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "Reverse64Float32x4",
 		argLen:  1,
 		generic: true,
 	},
