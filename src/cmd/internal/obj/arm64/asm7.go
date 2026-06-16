@@ -540,6 +540,8 @@ var optab = []Optab{
 	{AVDUP, C_ZREG, C_NONE, C_NONE, C_ARNG, C_NONE, 82, 4, 0, 0, 0},
 	{AVMOVI, C_ADDCON, C_NONE, C_NONE, C_ARNG, C_NONE, 86, 4, 0, 0, 0},
 	{AVFMLA, C_ARNG, C_ARNG, C_NONE, C_ARNG, C_NONE, 72, 4, 0, 0, 0},
+	{AVFMLA, C_ELEM, C_ARNG, C_NONE, C_ARNG, C_NONE, 111, 4, 0, 0, 0},
+	{AVFMLA, C_ELEM, C_FREG, C_NONE, C_FREG, C_NONE, 111, 4, 0, 0, 0},
 	{AVEXT, C_VCON, C_ARNG, C_ARNG, C_ARNG, C_NONE, 94, 4, 0, 0, 0},
 	{AVTBL, C_ARNG, C_NONE, C_LIST, C_ARNG, C_NONE, 100, 4, 0, 0, 0},
 	{AVUSHR, C_VCON, C_ARNG, C_NONE, C_ARNG, C_NONE, 95, 4, 0, 0, 0},
@@ -6189,6 +6191,80 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 
 		o1 = c.opirr(p, p.As)
 		o1 |= (uint32(rm&31) << 16) | (uint32(rn&31) << 5) | uint32(encodedOperation)
+
+	case 111: /* vfmla/vfmls Vm.<Ts>[index], Vn.<T>, Vd.<T>; scalar: <V>m.<Ts>[index], <V>n, <V>d */
+		rf := uint32(p.From.Reg & 31)
+		rn := uint32(p.Reg & 31)
+		rd := uint32(p.To.Reg & 31)
+		index := int(p.From.Index)
+
+		// The indexed source must be V0-V31; the M:Rm field is 5 bits wide.
+		if p.From.Reg < REG_ELEM || (p.From.Reg-REG_ELEM)&31 != p.From.Reg&31 {
+			c.ctxt.Diag("invalid indexed source register: %v", p)
+		}
+
+		// Element size and index width come from the indexed operand's
+		// arrangement: S selects a 32-bit element (sz=0, index 0-3 from H:L),
+		// D selects a 64-bit element (sz=1, index 0-1 from H).
+		var sz, L, H uint32
+		switch (p.From.Reg >> 5) & 15 {
+		case ARNG_S:
+			c.checkindex(p, index, 3)
+			sz = 0
+			L = uint32(index) & 1
+			H = uint32(index>>1) & 1
+		case ARNG_D:
+			c.checkindex(p, index, 1)
+			sz = 1
+			H = uint32(index) & 1
+		default:
+			c.ctxt.Diag("invalid arrangement: %v", p)
+		}
+
+		var Q uint32
+		scalar := p.To.Reg >= REG_F0 && p.To.Reg <= REG_F31
+		if scalar {
+			// Scalar by-element form: the accumulator and first source are
+			// plain scalar registers; sz already gives the element size.
+			o1 = 1<<30 | 1<<28 | 0xf<<24 | 1<<23 | 1<<12
+		} else {
+			// Vector by-element form: Vn/Vd arrangement must match and fixes
+			// Q and the element size.
+			at := (p.To.Reg >> 5) & 15
+			an := (p.Reg >> 5) & 15
+			if at != an {
+				c.ctxt.Diag("operand mismatch: %v", p)
+			}
+			switch at {
+			case ARNG_2S:
+				Q = 0
+				if sz != 0 {
+					c.ctxt.Diag("invalid arrangement: %v", p)
+				}
+			case ARNG_4S:
+				Q = 1
+				if sz != 0 {
+					c.ctxt.Diag("invalid arrangement: %v", p)
+				}
+			case ARNG_2D:
+				Q = 1
+				if sz != 1 {
+					c.ctxt.Diag("invalid arrangement: %v", p)
+				}
+			default:
+				c.ctxt.Diag("invalid arrangement: %v", p)
+			}
+			o1 = 0xf<<24 | 1<<23 | 1<<12
+		}
+
+		var o2 uint32
+		if p.As == AVFMLS {
+			o2 = 1
+		}
+
+		M := (rf >> 4) & 1
+		Rm := rf & 0xf
+		o1 |= Q<<30 | sz<<22 | L<<21 | M<<20 | Rm<<16 | o2<<14 | H<<11 | (rn << 5) | rd
 
 	case 127:
 		// Generic SVE instruction encoding
