@@ -511,6 +511,24 @@ func rewriteValueARM64(v *Value) bool {
 	case OpAbs:
 		v.Op = OpARM64FABSD
 		return true
+	case OpAbsDiffInt16x8:
+		v.Op = OpARM64VSABD8H
+		return true
+	case OpAbsDiffInt32x4:
+		v.Op = OpARM64VSABD4S
+		return true
+	case OpAbsDiffInt8x16:
+		v.Op = OpARM64VSABD16B
+		return true
+	case OpAbsDiffUint16x8:
+		v.Op = OpARM64VUABD8H
+		return true
+	case OpAbsDiffUint32x4:
+		v.Op = OpARM64VUABD4S
+		return true
+	case OpAbsDiffUint8x16:
+		v.Op = OpARM64VUABD16B
+		return true
 	case OpAbsFloat32x4:
 		v.Op = OpARM64VFABS4S
 		return true

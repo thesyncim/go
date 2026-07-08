@@ -233,6 +233,12 @@
 (MinUint32x4 ...) => (VUMIN4S ...) // pureVreg
 (MulFloat32x4 ...) => (VFMUL4S ...) // pureVreg
 (MulFloat64x2 ...) => (VFMUL2D ...) // pureVreg
+(AbsDiffInt8x16 ...) => (VSABD16B ...) // pureVreg
+(AbsDiffInt16x8 ...) => (VSABD8H ...) // pureVreg
+(AbsDiffInt32x4 ...) => (VSABD4S ...) // pureVreg
+(AbsDiffUint8x16 ...) => (VUABD16B ...) // pureVreg
+(AbsDiffUint16x8 ...) => (VUABD8H ...) // pureVreg
+(AbsDiffUint32x4 ...) => (VUABD4S ...) // pureVreg
 (MulInt8x16 ...) => (VMUL16B ...) // pureVreg
 (MulInt16x8 ...) => (VMUL8H ...) // pureVreg
 (MulInt32x4 ...) => (VMUL4S ...) // pureVreg

@@ -1177,6 +1177,37 @@ func (x Float32x4) Mul(y Float32x4) Float32x4
 // Asm: VFMUL, CPU Feature: NEON
 func (x Float64x2) Mul(y Float64x2) Float64x2
 
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|
+// (SABD/UABD), in one instruction.
+//
+// Asm: VSABD, CPU Feature: NEON
+func (x Int8x16) AbsDiff(y Int8x16) Int8x16
+
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|.
+//
+// Asm: VSABD, CPU Feature: NEON
+func (x Int16x8) AbsDiff(y Int16x8) Int16x8
+
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|.
+//
+// Asm: VSABD, CPU Feature: NEON
+func (x Int32x4) AbsDiff(y Int32x4) Int32x4
+
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|.
+//
+// Asm: VUABD, CPU Feature: NEON
+func (x Uint8x16) AbsDiff(y Uint8x16) Uint8x16
+
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|.
+//
+// Asm: VUABD, CPU Feature: NEON
+func (x Uint16x8) AbsDiff(y Uint16x8) Uint16x8
+
+// AbsDiff returns the absolute value of the lane-wise difference |x - y|.
+//
+// Asm: VUABD, CPU Feature: NEON
+func (x Uint32x4) AbsDiff(y Uint32x4) Uint32x4
+
 // Mul multiplies corresponding elements of two vectors, modulo 2ⁿ.
 //
 // Asm: VMUL, CPU Feature: NEON

@@ -746,6 +746,12 @@ func simdGenericOps() []opData {
 		{name: "MulHighUint16x8", argLength: 2, commutative: true},                      // ARCH:amd64
 		{name: "MulHighUint16x16", argLength: 2, commutative: true},                     // ARCH:amd64
 		{name: "MulHighUint16x32", argLength: 2, commutative: true},                     // ARCH:amd64
+		{name: "AbsDiffInt8x16", argLength: 2, commutative: true},                       // ARCH:arm64
+		{name: "AbsDiffInt16x8", argLength: 2, commutative: true},                       // ARCH:arm64
+		{name: "AbsDiffInt32x4", argLength: 2, commutative: true},                       // ARCH:arm64
+		{name: "AbsDiffUint8x16", argLength: 2, commutative: true},                      // ARCH:arm64
+		{name: "AbsDiffUint16x8", argLength: 2, commutative: true},                      // ARCH:arm64
+		{name: "AbsDiffUint32x4", argLength: 2, commutative: true},                      // ARCH:arm64
 		{name: "MulInt8x16", argLength: 2, commutative: true},                           // ARCH:arm64
 		{name: "MulInt16x8", argLength: 2, commutative: true},                           // ARCH:amd64,arm64,wasm
 		{name: "MulInt16x16", argLength: 2, commutative: true},                          // ARCH:amd64

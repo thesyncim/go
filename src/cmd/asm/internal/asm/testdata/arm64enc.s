@@ -665,6 +665,8 @@ TEXT asmtest(SB),DUPOK|NOSPLIT,$-8
 	VUDOT V2.B16, V1.B16, V0.S4                                 // 2094826e
 	VUSDOT V2.B16, V1.B16, V0.S4                                // 209c824e
 	VUSMMLA V2.B16, V1.B16, V0.S4                               // 20a4824e
+	VSABD V2.B16, V3.B16, V1.B16                                // 6174224e
+	VUABD V2.B16, V3.B16, V1.B16                                // 6174226e
 	VADDP V7.H8, V25.H8, V17.H8                                 // 31bf674e
 	VADDV V3.H8, V0                                             // 60b8714e
 	AESD V22.B16, V19.B16                                       // d35a284e

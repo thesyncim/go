@@ -3258,6 +3258,8 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVMLS, t)
 			oprangeset(AVSQDMULH, t)
 			oprangeset(AVSQRDMULH, t)
+			oprangeset(AVSABD, t)
+			oprangeset(AVUABD, t)
 			oprangeset(AVSHADD, t)
 			oprangeset(AVSRHADD, t)
 			oprangeset(AVSSHL, t)
@@ -4913,7 +4915,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			if af != ARNG_2D && af != ARNG_2S && af != ARNG_4S {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
-		case AVUMAX, AVUMIN, AVUMAXP, AVUMINP, AVMUL, AVMLA, AVMLS, AVSMAX, AVSMIN, AVSMAXP, AVSMINP:
+		case AVUMAX, AVUMIN, AVUMAXP, AVUMINP, AVMUL, AVMLA, AVMLS, AVSMAX, AVSMIN, AVSMAXP, AVSMINP, AVSABD, AVUABD:
 			if af == ARNG_2D {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
@@ -6972,6 +6974,12 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As, rd, rn, rm int16) uint32 {
 
 	case AVSQRDMULH:
 		op = ASIMDSAME(1, 0, 0x16)
+
+	case AVSABD:
+		op = ASIMDSAME(0, 0, 0x0e)
+
+	case AVUABD:
+		op = ASIMDSAME(1, 0, 0x0e)
 
 	case AVAND:
 		op = ASIMDSAME(0, 0, 0x03)
