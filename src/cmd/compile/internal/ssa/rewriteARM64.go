@@ -1614,6 +1614,12 @@ func rewriteValueARM64(v *Value) bool {
 	case OpMulFloat64x2:
 		v.Op = OpARM64VFMUL2D
 		return true
+	case OpMulHighRoundInt16x8:
+		v.Op = OpARM64VSQRDMULH8H
+		return true
+	case OpMulHighRoundInt32x4:
+		v.Op = OpARM64VSQRDMULH4S
+		return true
 	case OpMulInt16x8:
 		v.Op = OpARM64VMUL8H
 		return true

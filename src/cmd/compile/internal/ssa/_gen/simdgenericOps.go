@@ -747,6 +747,8 @@ func simdGenericOps() []opData {
 		{name: "MulInt16x16", argLength: 2, commutative: true},                          // ARCH:amd64
 		{name: "MulInt16x32", argLength: 2, commutative: true},                          // ARCH:amd64
 		{name: "MulInt32x4", argLength: 2, commutative: true},                           // ARCH:amd64,arm64,wasm
+		{name: "MulHighRoundInt16x8", argLength: 2, commutative: true},                  // ARCH:arm64
+		{name: "MulHighRoundInt32x4", argLength: 2, commutative: true},                  // ARCH:arm64
 		{name: "MulInt32x8", argLength: 2, commutative: true},                           // ARCH:amd64
 		{name: "MulInt32x16", argLength: 2, commutative: true},                          // ARCH:amd64
 		{name: "MulInt64x2", argLength: 2, commutative: true},                           // ARCH:amd64,wasm

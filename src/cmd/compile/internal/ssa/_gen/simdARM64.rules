@@ -236,6 +236,8 @@
 (MulInt8x16 ...) => (VMUL16B ...) // pureVreg
 (MulInt16x8 ...) => (VMUL8H ...) // pureVreg
 (MulInt32x4 ...) => (VMUL4S ...) // pureVreg
+(MulHighRoundInt16x8 ...) => (VSQRDMULH8H ...) // pureVreg
+(MulHighRoundInt32x4 ...) => (VSQRDMULH4S ...) // pureVreg
 (MulUint8x16 ...) => (VMUL16B ...) // pureVreg
 (MulUint16x8 ...) => (VMUL8H ...) // pureVreg
 (MulUint32x4 ...) => (VMUL4S ...) // pureVreg

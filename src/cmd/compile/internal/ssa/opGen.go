@@ -5097,6 +5097,8 @@ const (
 	OpARM64VMUL4S
 	OpARM64VMUL8H
 	OpARM64VMUL16B
+	OpARM64VSQRDMULH4S
+	OpARM64VSQRDMULH8H
 	OpARM64VNEG2D
 	OpARM64VNEG4S
 	OpARM64VNEG8H
@@ -7947,6 +7949,8 @@ const (
 	OpMulInt16x16
 	OpMulInt16x32
 	OpMulInt32x4
+	OpMulHighRoundInt16x8
+	OpMulHighRoundInt32x4
 	OpMulInt32x8
 	OpMulInt32x16
 	OpMulInt64x2
@@ -81170,6 +81174,36 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
+		name:        "VSQRDMULH4S",
+		argLen:      2,
+		commutative: true,
+		asm:         arm64.AVSQRDMULH,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		name:        "VSQRDMULH8H",
+		argLen:      2,
+		commutative: true,
+		asm:         arm64.AVSQRDMULH,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		name:   "VNEG2D",
 		argLen: 1,
 		asm:    arm64.AVNEG,
@@ -111043,6 +111077,18 @@ var opcodeTable = [...]opInfo{
 	},
 	{
 		name:        "MulInt32x4",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulHighRoundInt16x8",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulHighRoundInt32x4",
 		argLen:      2,
 		commutative: true,
 		generic:     true,

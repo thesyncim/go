@@ -3255,6 +3255,8 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVMUL, t)
 			oprangeset(AVMLA, t)
 			oprangeset(AVMLS, t)
+			oprangeset(AVSQDMULH, t)
+			oprangeset(AVSQRDMULH, t)
 			oprangeset(AVSHADD, t)
 			oprangeset(AVSRHADD, t)
 			oprangeset(AVSSHL, t)
@@ -4907,6 +4909,11 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			}
 		case AVUMAX, AVUMIN, AVUMAXP, AVUMINP, AVMUL, AVMLA, AVMLS, AVSMAX, AVSMIN, AVSMAXP, AVSMINP:
 			if af == ARNG_2D {
+				c.ctxt.Diag("invalid arrangement: %v", p)
+			}
+		case AVSQDMULH, AVSQRDMULH:
+			// (Rounding) saturating doubling multiply high: 16-/32-bit only.
+			if af != ARNG_4H && af != ARNG_8H && af != ARNG_2S && af != ARNG_4S {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
 		}
@@ -6918,6 +6925,12 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As, rd, rn, rm int16) uint32 {
 
 	case AVMLS:
 		op = ASIMDSAME(1, 0, 0x12)
+
+	case AVSQDMULH:
+		op = ASIMDSAME(0, 0, 0x16)
+
+	case AVSQRDMULH:
+		op = ASIMDSAME(1, 0, 0x16)
 
 	case AVAND:
 		op = ASIMDSAME(0, 0, 0x03)

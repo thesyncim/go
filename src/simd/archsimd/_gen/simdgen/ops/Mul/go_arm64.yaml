@@ -36,3 +36,29 @@
   out:
   - go: $u
     base: uint
+
+# Signed saturating rounding doubling multiply returning high half (SQRDMULH).
+# result = round(2*a*b >> elemBits), i.e. a Q(elemBits-1) fixed-point multiply;
+# 16- and 32-bit lanes only. Enables in-lane fixed-point DCT/ADST butterflies.
+- go: MulHighRound
+  asm: "VSQRDMULH"
+  in:
+  - &sqrdmulh
+    go: $t
+    base: int
+    elemBits: 16|32
+  - *sqrdmulh
+  out:
+  - *sqrdmulh
+
+# Signed saturating doubling multiply returning high half (SQDMULH, truncating).
+- go: MulHigh
+  asm: "VSQDMULH"
+  in:
+  - &sqdmulh
+    go: $t
+    base: int
+    elemBits: 16|32
+  - *sqdmulh
+  out:
+  - *sqdmulh
