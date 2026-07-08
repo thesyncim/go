@@ -3293,6 +3293,8 @@ func buildop(ctxt *obj.Link) {
 
 		case AVSDOT:
 			oprangeset(AVUDOT, t)
+			oprangeset(AVUSDOT, t)
+			oprangeset(AVUSMMLA, t)
 
 		case AVADD:
 			oprangeset(AVSUB, t)
@@ -6277,11 +6279,18 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		Rm := rf & 0xf
 		o1 |= Q<<30 | sz<<22 | L<<21 | M<<20 | Rm<<16 | o2<<14 | H<<11 | (rn << 5) | rd
 
-	case 112: /* sdot/udot Vm.<Tb>, Vn.<Tb>, Vd.<Ta>: 4-way byte dot product accumulating into Vd */
-		// Encoding: 0 Q U 01110 10 0 Rm 100101 Rn Rd (U=0 SDOT, U=1 UDOT).
-		var op uint32 = 0x0e809400
-		if p.As == AVUDOT {
-			op = 0x2e809400
+	case 112: /* sdot/udot/usdot/usmmla Vm.<Tb>, Vn.<Tb>, Vd.<Ta>: byte dot product / matrix accumulate into Vd */
+		// All share the dst-.4S / srcs-.16B shape; only the base opcode differs.
+		var op uint32
+		switch p.As {
+		case AVUDOT:
+			op = 0x2e809400 // 0 Q 1 01110 10 0 Rm 100101 Rn Rd
+		case AVUSDOT:
+			op = 0x0e809c00 // opcode 100111 (I8MM)
+		case AVUSMMLA:
+			op = 0x0e80a400 // opcode 101001 (I8MM matrix, .4S/.16B only)
+		default: // AVSDOT
+			op = 0x0e809400 // opcode 100101
 		}
 		rf := uint32(p.From.Reg & 31)
 		rn := uint32(p.Reg & 31)

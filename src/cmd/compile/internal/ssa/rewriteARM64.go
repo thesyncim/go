@@ -1074,6 +1074,8 @@ func rewriteValueARM64(v *Value) bool {
 		return true
 	case OpDotProdInt32x4:
 		return rewriteValueARM64_OpDotProdInt32x4(v)
+	case OpDotProdUSInt32x4:
+		return rewriteValueARM64_OpDotProdUSInt32x4(v)
 	case OpDotProdUint32x4:
 		return rewriteValueARM64_OpDotProdUint32x4(v)
 	case OpEq16:
@@ -1495,6 +1497,8 @@ func rewriteValueARM64(v *Value) bool {
 	case OpLsh8x8:
 		v.Op = OpLsh64x8
 		return true
+	case OpMatMulUSInt32x4:
+		return rewriteValueARM64_OpMatMulUSInt32x4(v)
 	case OpMax32F:
 		v.Op = OpARM64FMAXS
 		return true
@@ -20105,6 +20109,21 @@ func rewriteValueARM64_OpDotProdInt32x4(v *Value) bool {
 		return true
 	}
 }
+func rewriteValueARM64_OpDotProdUSInt32x4(v *Value) bool {
+	v_2 := v.Args[2]
+	v_1 := v.Args[1]
+	v_0 := v.Args[0]
+	// match: (DotProdUSInt32x4 acc x y)
+	// result: (VUSDOT4S acc x y)
+	for {
+		acc := v_0
+		x := v_1
+		y := v_2
+		v.reset(OpARM64VUSDOT4S)
+		v.AddArg3(acc, x, y)
+		return true
+	}
+}
 func rewriteValueARM64_OpDotProdUint32x4(v *Value) bool {
 	v_2 := v.Args[2]
 	v_1 := v.Args[1]
@@ -21289,6 +21308,21 @@ func rewriteValueARM64_OpLsh64x8(v *Value) bool {
 		return true
 	}
 	return false
+}
+func rewriteValueARM64_OpMatMulUSInt32x4(v *Value) bool {
+	v_2 := v.Args[2]
+	v_1 := v.Args[1]
+	v_0 := v.Args[0]
+	// match: (MatMulUSInt32x4 acc x y)
+	// result: (VUSMMLA4S acc x y)
+	for {
+		acc := v_0
+		x := v_1
+		y := v_2
+		v.reset(OpARM64VUSMMLA4S)
+		v.AddArg3(acc, x, y)
+		return true
+	}
 }
 func rewriteValueARM64_OpMod16(v *Value) bool {
 	v_1 := v.Args[1]

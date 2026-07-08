@@ -100,6 +100,8 @@ func simdARM64Ops(v11, v21, v31, vgp, vgpv, vfpv regInfo) []opData {
 		{name: "VMLA8H", argLength: 3, reg: v31, asm: "VMLA", typ: "Vec128", resultInArg0: true},
 		{name: "VSDOT4S", argLength: 3, reg: v31, asm: "VSDOT", typ: "Vec128", resultInArg0: true},
 		{name: "VUDOT4S", argLength: 3, reg: v31, asm: "VUDOT", typ: "Vec128", resultInArg0: true},
+		{name: "VUSDOT4S", argLength: 3, reg: v31, asm: "VUSDOT", typ: "Vec128", resultInArg0: true},
+		{name: "VUSMMLA4S", argLength: 3, reg: v31, asm: "VUSMMLA", typ: "Vec128", resultInArg0: true},
 		{name: "VMLA16B", argLength: 3, reg: v31, asm: "VMLA", typ: "Vec128", resultInArg0: true},
 		{name: "VMUL4S", argLength: 2, reg: v21, asm: "VMUL", commutative: true, typ: "Vec128"},
 		{name: "VMUL8H", argLength: 2, reg: v21, asm: "VMUL", commutative: true, typ: "Vec128"},

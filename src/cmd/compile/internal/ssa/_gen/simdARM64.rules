@@ -248,6 +248,8 @@
 (MulAddInt32x4 x y z) => (VMLA4S z x y) // specialLower
 (DotProdInt32x4 acc x y) => (VSDOT4S acc x y) // specialLower
 (DotProdUint32x4 acc x y) => (VUDOT4S acc x y) // specialLower
+(DotProdUSInt32x4 acc x y) => (VUSDOT4S acc x y) // specialLower
+(MatMulUSInt32x4 acc x y) => (VUSMMLA4S acc x y) // specialLower
 (MulAddUint8x16 x y z) => (VMLA16B z x y) // specialLower
 (MulAddUint16x8 x y z) => (VMLA8H z x y) // specialLower
 (MulAddUint32x4 x y z) => (VMLA4S z x y) // specialLower

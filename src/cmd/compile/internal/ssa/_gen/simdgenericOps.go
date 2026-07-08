@@ -723,6 +723,8 @@ func simdGenericOps() []opData {
 		{name: "MulAddInt32x4", argLength: 3},                                           // ARCH:arm64
 		{name: "DotProdInt32x4", argLength: 3},                                          // ARCH:arm64
 		{name: "DotProdUint32x4", argLength: 3},                                         // ARCH:arm64
+		{name: "DotProdUSInt32x4", argLength: 3},                                        // ARCH:arm64
+		{name: "MatMulUSInt32x4", argLength: 3},                                         // ARCH:arm64
 		{name: "MulAddOddSubEvenFloat32x4", argLength: 3},                               // ARCH:amd64
 		{name: "MulAddOddSubEvenFloat32x8", argLength: 3},                               // ARCH:amd64
 		{name: "MulAddOddSubEvenFloat32x16", argLength: 3},                              // ARCH:amd64

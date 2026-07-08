@@ -1219,6 +1219,22 @@ func (x Int32x4) DotProd(y Int8x16, z Int8x16) Int32x4
 // Asm: VUDOT, CPU Feature: DOTPROD
 func (x Uint32x4) DotProd(y Uint8x16, z Uint8x16) Uint32x4
 
+// DotProdUS computes, for each of the 4 int32 lanes, the sum of 4 products of
+// the corresponding UNSIGNED bytes of y and SIGNED bytes of z, added to the
+// accumulator x (USDOT). This is the shape used to convolve unsigned pixels
+// with signed filter taps.
+//
+// Asm: VUSDOT, CPU Feature: I8MM
+func (x Int32x4) DotProdUS(y Uint8x16, z Int8x16) Int32x4
+
+// MatMulUS computes an 8-bit integer matrix-multiply-accumulate of the unsigned
+// 2x8 sub-matrix in y and the signed 8x2 sub-matrix in z into the 2x2 int32
+// accumulator x (USMMLA). It performs the work of eight byte multiplies per
+// output lane in a single instruction.
+//
+// Asm: VUSMMLA, CPU Feature: I8MM
+func (x Int32x4) MatMulUS(y Uint8x16, z Int8x16) Int32x4
+
 // Mul multiplies corresponding elements of two vectors, modulo 2ⁿ.
 //
 // Asm: VMUL, CPU Feature: NEON
