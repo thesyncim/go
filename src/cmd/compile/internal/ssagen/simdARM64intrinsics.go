@@ -210,6 +210,8 @@ func simdARM64Intrinsics(addF func(pkg, fn string, b intrinsicBuilder, archFamil
 	addF(simdPackage, "Int8x16.Mul", opLen2(ssa.OpMulInt8x16, types.TypeVec128), sys.ARM64)
 	addF(simdPackage, "Int16x8.Mul", opLen2(ssa.OpMulInt16x8, types.TypeVec128), sys.ARM64)
 	addF(simdPackage, "Int32x4.Mul", opLen2(ssa.OpMulInt32x4, types.TypeVec128), sys.ARM64)
+	addF(simdPackage, "Int16x8.MulHighRound", opLen2(ssa.OpMulHighRoundInt16x8, types.TypeVec128), sys.ARM64)
+	addF(simdPackage, "Int32x4.MulHighRound", opLen2(ssa.OpMulHighRoundInt32x4, types.TypeVec128), sys.ARM64)
 	addF(simdPackage, "Uint8x16.Mul", opLen2(ssa.OpMulUint8x16, types.TypeVec128), sys.ARM64)
 	addF(simdPackage, "Uint16x8.Mul", opLen2(ssa.OpMulUint16x8, types.TypeVec128), sys.ARM64)
 	addF(simdPackage, "Uint32x4.Mul", opLen2(ssa.OpMulUint32x4, types.TypeVec128), sys.ARM64)

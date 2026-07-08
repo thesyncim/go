@@ -1192,6 +1192,20 @@ func (x Int16x8) Mul(y Int16x8) Int16x8
 // Asm: VMUL, CPU Feature: NEON
 func (x Int32x4) Mul(y Int32x4) Int32x4
 
+// MulHighRound multiplies corresponding elements as a signed saturating
+// rounding doubling multiply, returning the high half: round(2*x*y >> 16).
+// This is a Q15 fixed-point multiply, used for in-lane fixed-point transforms.
+//
+// Asm: VSQRDMULH, CPU Feature: NEON
+func (x Int16x8) MulHighRound(y Int16x8) Int16x8
+
+// MulHighRound multiplies corresponding elements as a signed saturating
+// rounding doubling multiply, returning the high half: round(2*x*y >> 32).
+// This is a Q31 fixed-point multiply, used for in-lane fixed-point transforms.
+//
+// Asm: VSQRDMULH, CPU Feature: NEON
+func (x Int32x4) MulHighRound(y Int32x4) Int32x4
+
 // Mul multiplies corresponding elements of two vectors, modulo 2ⁿ.
 //
 // Asm: VMUL, CPU Feature: NEON
