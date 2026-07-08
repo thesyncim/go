@@ -289,6 +289,10 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssa.OpARM64VMLA8H:
 		p = simdV31ResultInArg0(s, v, arm64.ARNG_8H)
 
+	case ssa.OpARM64VSDOT4S,
+		ssa.OpARM64VUDOT4S:
+		p = simdV31ResultInArg0DotProd(s, v, arm64.ARNG_16B, arm64.ARNG_4S)
+
 	case ssa.OpARM64VMOVBextr:
 		p = simdVgpImmIn1(s, v, arm64.ARNG_B)
 

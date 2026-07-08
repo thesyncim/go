@@ -5093,6 +5093,8 @@ const (
 	OpARM64VFSUB4S
 	OpARM64VMLA4S
 	OpARM64VMLA8H
+	OpARM64VSDOT4S
+	OpARM64VUDOT4S
 	OpARM64VMLA16B
 	OpARM64VMUL4S
 	OpARM64VMUL8H
@@ -7923,6 +7925,8 @@ const (
 	OpMulAddInt8x16
 	OpMulAddInt16x8
 	OpMulAddInt32x4
+	OpDotProdInt32x4
+	OpDotProdUint32x4
 	OpMulAddOddSubEvenFloat32x4
 	OpMulAddOddSubEvenFloat32x8
 	OpMulAddOddSubEvenFloat32x16
@@ -81113,6 +81117,38 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
+		name:         "VSDOT4S",
+		argLen:       3,
+		resultInArg0: true,
+		asm:          arm64.AVSDOT,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		name:         "VUDOT4S",
+		argLen:       3,
+		resultInArg0: true,
+		asm:          arm64.AVUDOT,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 9223372034707292160, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		name:         "VMLA16B",
 		argLen:       3,
 		resultInArg0: true,
@@ -110931,6 +110967,16 @@ var opcodeTable = [...]opInfo{
 	},
 	{
 		name:    "MulAddInt32x4",
+		argLen:  3,
+		generic: true,
+	},
+	{
+		name:    "DotProdInt32x4",
+		argLen:  3,
+		generic: true,
+	},
+	{
+		name:    "DotProdUint32x4",
 		argLen:  3,
 		generic: true,
 	},

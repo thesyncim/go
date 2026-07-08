@@ -1072,6 +1072,10 @@ func rewriteValueARM64(v *Value) bool {
 	case OpDivFloat64x2:
 		v.Op = OpARM64VFDIV2D
 		return true
+	case OpDotProdInt32x4:
+		return rewriteValueARM64_OpDotProdInt32x4(v)
+	case OpDotProdUint32x4:
+		return rewriteValueARM64_OpDotProdUint32x4(v)
 	case OpEq16:
 		return rewriteValueARM64_OpEq16(v)
 	case OpEq32:
@@ -20083,6 +20087,36 @@ func rewriteValueARM64_OpDiv8u(v *Value) bool {
 		v1 := b.NewValue0(v.Pos, OpZeroExt8to32, typ.UInt32)
 		v1.AddArg(y)
 		v.AddArg2(v0, v1)
+		return true
+	}
+}
+func rewriteValueARM64_OpDotProdInt32x4(v *Value) bool {
+	v_2 := v.Args[2]
+	v_1 := v.Args[1]
+	v_0 := v.Args[0]
+	// match: (DotProdInt32x4 acc x y)
+	// result: (VSDOT4S acc x y)
+	for {
+		acc := v_0
+		x := v_1
+		y := v_2
+		v.reset(OpARM64VSDOT4S)
+		v.AddArg3(acc, x, y)
+		return true
+	}
+}
+func rewriteValueARM64_OpDotProdUint32x4(v *Value) bool {
+	v_2 := v.Args[2]
+	v_1 := v.Args[1]
+	v_0 := v.Args[0]
+	// match: (DotProdUint32x4 acc x y)
+	// result: (VUDOT4S acc x y)
+	for {
+		acc := v_0
+		x := v_1
+		y := v_2
+		v.reset(OpARM64VUDOT4S)
+		v.AddArg3(acc, x, y)
 		return true
 	}
 }

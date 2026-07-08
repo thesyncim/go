@@ -542,6 +542,7 @@ var optab = []Optab{
 	{AVFMLA, C_ARNG, C_ARNG, C_NONE, C_ARNG, C_NONE, 72, 4, 0, 0, 0},
 	{AVFMLA, C_ELEM, C_ARNG, C_NONE, C_ARNG, C_NONE, 111, 4, 0, 0, 0},
 	{AVFMLA, C_ELEM, C_FREG, C_NONE, C_FREG, C_NONE, 111, 4, 0, 0, 0},
+	{AVSDOT, C_ARNG, C_ARNG, C_NONE, C_ARNG, C_NONE, 112, 4, 0, 0, 0},
 	{AVEXT, C_VCON, C_ARNG, C_ARNG, C_ARNG, C_NONE, 94, 4, 0, 0, 0},
 	{AVTBL, C_ARNG, C_NONE, C_LIST, C_ARNG, C_NONE, 100, 4, 0, 0, 0},
 	{AVUSHR, C_VCON, C_ARNG, C_NONE, C_ARNG, C_NONE, 95, 4, 0, 0, 0},
@@ -3289,6 +3290,9 @@ func buildop(ctxt *obj.Link) {
 
 		case AVFCMLE:
 			oprangeset(AVFCMLT, t)
+
+		case AVSDOT:
+			oprangeset(AVUDOT, t)
 
 		case AVADD:
 			oprangeset(AVSUB, t)
@@ -6272,6 +6276,34 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		M := (rf >> 4) & 1
 		Rm := rf & 0xf
 		o1 |= Q<<30 | sz<<22 | L<<21 | M<<20 | Rm<<16 | o2<<14 | H<<11 | (rn << 5) | rd
+
+	case 112: /* sdot/udot Vm.<Tb>, Vn.<Tb>, Vd.<Ta>: 4-way byte dot product accumulating into Vd */
+		// Encoding: 0 Q U 01110 10 0 Rm 100101 Rn Rd (U=0 SDOT, U=1 UDOT).
+		var op uint32 = 0x0e809400
+		if p.As == AVUDOT {
+			op = 0x2e809400
+		}
+		rf := uint32(p.From.Reg & 31)
+		rn := uint32(p.Reg & 31)
+		rd := uint32(p.To.Reg & 31)
+		var Q uint32
+		// The destination's word arrangement fixes Q; the sources must be the
+		// matching byte arrangement.
+		switch (p.To.Reg >> 5) & 15 {
+		case ARNG_4S:
+			Q = 1
+			if (p.From.Reg>>5)&15 != ARNG_16B || (p.Reg>>5)&15 != ARNG_16B {
+				c.ctxt.Diag("invalid arrangement: %v", p)
+			}
+		case ARNG_2S:
+			Q = 0
+			if (p.From.Reg>>5)&15 != ARNG_8B || (p.Reg>>5)&15 != ARNG_8B {
+				c.ctxt.Diag("invalid arrangement: %v", p)
+			}
+		default:
+			c.ctxt.Diag("invalid arrangement: %v", p)
+		}
+		o1 = op | Q<<30 | rf<<16 | rn<<5 | rd
 
 	case 127:
 		// Generic SVE instruction encoding

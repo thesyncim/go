@@ -1206,6 +1206,19 @@ func (x Int16x8) MulHighRound(y Int16x8) Int16x8
 // Asm: VSQRDMULH, CPU Feature: NEON
 func (x Int32x4) MulHighRound(y Int32x4) Int32x4
 
+// DotProd computes, for each of the 4 int32 lanes, the sum of 4 products of the
+// corresponding signed bytes of y and z, added to the accumulator x (SDOT):
+// x[i] += sum(y[4i+k]*z[4i+k] for k in 0..3).
+//
+// Asm: VSDOT, CPU Feature: DOTPROD
+func (x Int32x4) DotProd(y Int8x16, z Int8x16) Int32x4
+
+// DotProd computes, for each of the 4 uint32 lanes, the sum of 4 products of the
+// corresponding unsigned bytes of y and z, added to the accumulator x (UDOT).
+//
+// Asm: VUDOT, CPU Feature: DOTPROD
+func (x Uint32x4) DotProd(y Uint8x16, z Uint8x16) Uint32x4
+
 // Mul multiplies corresponding elements of two vectors, modulo 2ⁿ.
 //
 // Asm: VMUL, CPU Feature: NEON

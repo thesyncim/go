@@ -661,6 +661,8 @@ TEXT asmtest(SB),DUPOK|NOSPLIT,$-8
 	VADD V5.H8, V18.H8, V9.H8                                   // 4986654e
 	VSQRDMULH V2.S4, V3.S4, V1.S4                               // 61b4a26e
 	VSQDMULH V2.H8, V3.H8, V1.H8                                // 61b4624e
+	VSDOT V2.B16, V1.B16, V0.S4                                 // 2094824e
+	VUDOT V2.B16, V1.B16, V0.S4                                 // 2094826e
 	VADDP V7.H8, V25.H8, V17.H8                                 // 31bf674e
 	VADDV V3.H8, V0                                             // 60b8714e
 	AESD V22.B16, V19.B16                                       // d35a284e

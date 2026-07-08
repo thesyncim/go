@@ -387,6 +387,19 @@ func simdV31ResultInArg0(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.
 	return p
 }
 
+// simdV31ResultInArg0DotProd emits a dot-product accumulate (SDOT/UDOT) whose
+// sources use a byte arrangement while the accumulator/result uses a word
+// arrangement.
+func simdV31ResultInArg0DotProd(s *ssagen.State, v *ssa.Value, srcArng, dstArng int16) *obj.Prog {
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[2].Reg(), srcArng)
+	p.Reg = simdRegArng(v.Args[1].Reg(), srcArng)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), dstArng)
+	return p
+}
+
 // simdV21List generates a binary instruction with register list, e.g. TBL Vm.Ta, {Vn.B16}, Vd.Ta.
 func simdV21List(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
 	if v.Op.Asm() != arm64.AVTBL { // TODO: support other instructions as needed.
