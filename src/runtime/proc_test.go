@@ -1586,3 +1586,62 @@ func TestMexitSTW(t *testing.T) {
 		t.Fatalf("expected %q, but got:\n%s", want, got)
 	}
 }
+
+// A P whose waitingG cache and the central waitingG cache are both empty
+// should allocate a batch of waitingGs, not one per acquire. A woken
+// goroutine usually releases its waitingG on another P, so such a P would
+// otherwise allocate on nearly every acquire.
+func TestWaitingGCacheBatchAlloc(t *testing.T) {
+	n, capacity := runtime.WaitingGCacheRefill()
+	if want := capacity/2 - 1; n != want {
+		t.Errorf("after acquiring from empty caches, P's cache holds %d waitingGs, want %d", n, want)
+	}
+}
+
+// A GC should keep a bounded central waitingG cache rather than drop it:
+// waitingGs migrate between Ps through it, and Ps that find it empty
+// right after a GC must allocate.
+func TestWaitingGCentralCacheGC(t *testing.T) {
+	_, capacity := runtime.WaitingGCacheRefill()
+	keep := runtime.GOMAXPROCS(0) * capacity / 2
+	runtime.AddWaitingGCentral(2 * keep)
+	runtime.GC()
+	// Other Ps may move waitingGs in and out after the GC,
+	// but not by keep in this test.
+	if n := runtime.WaitingGCentralLen(); n == 0 || n >= 2*keep {
+		t.Errorf("after GC, central waitingG cache holds %d, want 0 < n < %d (kept %d)", n, 2*keep, keep)
+	}
+}
+
+// BenchmarkChanFanOutGC hands work to parked goroutines over a channel and
+// waits for them with a WaitGroup while collections run, the pattern that
+// makes waitingGs migrate between Ps.
+func BenchmarkChanFanOutGC(b *testing.B) {
+	workers := runtime.GOMAXPROCS(0)
+	work := make(chan struct{})
+	var wg sync.WaitGroup
+	for range workers {
+		go func() {
+			for range work {
+				wg.Done()
+			}
+		}()
+	}
+	defer close(work)
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	gcs := 0
+	for i := 0; b.Loop(); i++ {
+		if i%256 == 0 {
+			runtime.GC()
+			gcs++
+		}
+		wg.Add(workers)
+		for range workers {
+			work <- struct{}{}
+		}
+		wg.Wait()
+	}
+	runtime.ReadMemStats(&after)
+	b.ReportMetric(float64(after.Mallocs-before.Mallocs)/float64(gcs), "mallocs/GC")
+}
