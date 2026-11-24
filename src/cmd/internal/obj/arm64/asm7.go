@@ -380,6 +380,25 @@ func ASIMDSHF(u, opcode uint32) uint32 {
 	return u<<29 | 0xF<<24 | opcode<<11 | 1<<10
 }
 
+// isNarrowShift reports whether as is a narrowing shift right by immediate,
+// such as SHRN or SQRSHRUN, and whether it is the variant that writes the
+// upper half of the destination, such as SHRN2.
+func isNarrowShift(as obj.As) (narrow, hi bool) {
+	switch as {
+	case AVSHRN, AVRSHRN, AVSQSHRN, AVSQRSHRN, AVSQSHRUN, AVSQRSHRUN, AVUQSHRN, AVUQRSHRN:
+		return true, false
+	case AVSHRN2, AVRSHRN2, AVSQSHRN2, AVSQRSHRN2, AVSQSHRUN2, AVSQRSHRUN2, AVUQSHRN2, AVUQRSHRN2:
+		return true, true
+	}
+	return false, false
+}
+
+// ASIMDDOT returns the encoding of an Advanced SIMD three-register extension
+// dot product instruction (SDOT, UDOT, USDOT) with the given U and opcode.
+func ASIMDDOT(u, opcode uint32) uint32 {
+	return u<<29 | 0x7<<25 | 2<<22 | 1<<15 | opcode<<11 | 1<<10
+}
+
 func ASISDPAIR(u, size, opcode uint32) uint32 {
 	return 1<<30 | u<<29 | 0x1E<<24 | size<<22 | 0x18<<17 | opcode<<12 | 0b10<<10
 }
@@ -642,6 +661,8 @@ var optab = []Optab{
 	{AVUSHLL, C_VCON, C_ARNG, C_NONE, C_ARNG, C_NONE, 102, 4, 0, 0, 0},
 	{AVUXTL, C_ARNG, C_NONE, C_NONE, C_ARNG, C_NONE, 102, 4, 0, 0, 0},
 	{AVUADDW, C_ARNG, C_ARNG, C_NONE, C_ARNG, C_NONE, 105, 4, 0, 0, 0},
+	{AVUADDLP, C_ARNG, C_NONE, C_NONE, C_ARNG, C_NONE, 112, 4, 0, 0, 0},
+	{AVUDOT, C_ARNG, C_ARNG, C_NONE, C_ARNG, C_NONE, 113, 4, 0, 0, 0},
 
 	/* conditional operations */
 	{ACSEL, C_COND, C_ZREG, C_ZREG, C_ZREG, C_NONE, 18, 4, 0, 0, 0},
@@ -3362,6 +3383,12 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVUZP1, t)
 			oprangeset(AVUZP2, t)
 			oprangeset(AVBIF, t)
+			oprangeset(AVSABA, t)
+			oprangeset(AVUABA, t)
+			oprangeset(AVSABD, t)
+			oprangeset(AVUABD, t)
+			oprangeset(AVSQDMULH, t)
+			oprangeset(AVSQRDMULH, t)
 
 		case AVCMEQ:
 			oprangeset(AVCMGE, t)
@@ -3445,6 +3472,14 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVUMLSL2, t)
 			oprangeset(AVUMULL, t)
 			oprangeset(AVUMULL2, t)
+			oprangeset(AVSABAL, t)
+			oprangeset(AVSABAL2, t)
+			oprangeset(AVUABAL, t)
+			oprangeset(AVUABAL2, t)
+			oprangeset(AVSABDL, t)
+			oprangeset(AVSABDL2, t)
+			oprangeset(AVUABDL, t)
+			oprangeset(AVUABDL2, t)
 
 		case AVUSHR:
 			oprangeset(AVSHL, t)
@@ -3453,8 +3488,35 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVUSRA, t)
 			oprangeset(AVSSHR, t)
 			oprangeset(AVSRSHR, t)
+			oprangeset(AVURSHR, t)
+			oprangeset(AVSSRA, t)
+			oprangeset(AVSRSRA, t)
+			oprangeset(AVURSRA, t)
 			oprangeset(AVSHRN, t)
 			oprangeset(AVSHRN2, t)
+			oprangeset(AVRSHRN, t)
+			oprangeset(AVRSHRN2, t)
+			oprangeset(AVSQSHRN, t)
+			oprangeset(AVSQSHRN2, t)
+			oprangeset(AVSQRSHRN, t)
+			oprangeset(AVSQRSHRN2, t)
+			oprangeset(AVSQSHRUN, t)
+			oprangeset(AVSQSHRUN2, t)
+			oprangeset(AVSQRSHRUN, t)
+			oprangeset(AVSQRSHRUN2, t)
+			oprangeset(AVUQSHRN, t)
+			oprangeset(AVUQSHRN2, t)
+			oprangeset(AVUQRSHRN, t)
+			oprangeset(AVUQRSHRN2, t)
+
+		case AVUADDLP:
+			oprangeset(AVSADDLP, t)
+			oprangeset(AVUADALP, t)
+			oprangeset(AVSADALP, t)
+
+		case AVUDOT:
+			oprangeset(AVSDOT, t)
+			oprangeset(AVUSDOT, t)
 
 		case AVXTN:
 			oprangeset(AVXTN2, t)
@@ -4997,8 +5059,13 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			if af != ARNG_2D && af != ARNG_2S && af != ARNG_4S {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
-		case AVUMAX, AVUMIN, AVUMAXP, AVUMINP, AVMUL, AVMLA, AVMLS, AVSMAX, AVSMIN, AVSMAXP, AVSMINP:
+		case AVUMAX, AVUMIN, AVUMAXP, AVUMINP, AVMUL, AVMLA, AVMLS, AVSMAX, AVSMIN, AVSMAXP, AVSMINP,
+			AVSABA, AVUABA, AVSABD, AVUABD:
 			if af == ARNG_2D {
+				c.ctxt.Diag("invalid arrangement: %v", p)
+			}
+		case AVSQDMULH, AVSQRDMULH:
+			if af != ARNG_4H && af != ARNG_8H && af != ARNG_2S && af != ARNG_4S {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
 		}
@@ -5683,7 +5750,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		}
 		o1 |= (uint32(imm5&0x1f) << 16) | (uint32(imm4&0xf) << 11) | (uint32(rf&31) << 5) | uint32(rt&31)
 
-	case 93: /* vpmull{2}/v(s|u)(mla|mls|mul)l{2} Vm.<Tb>, Vn.<Tb>, Vd.<Ta> */
+	case 93: /* vpmull{2}/v(s|u)(mla|mls|mul)l{2}/v(s|u)(aba|abd)l{2} Vm.<Tb>, Vn.<Tb>, Vd.<Ta> */
 		af := uint8((p.From.Reg >> 5) & 15)
 		at := uint8((p.To.Reg >> 5) & 15)
 		a := uint8((p.Reg >> 5) & 15)
@@ -5693,7 +5760,8 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 
 		var Q, size uint32
 		switch p.As {
-		case AVPMULL2, AVSMLAL2, AVSMLSL2, AVSMULL2, AVUMLAL2, AVUMLSL2, AVUMULL2:
+		case AVPMULL2, AVSMLAL2, AVSMLSL2, AVSMULL2, AVUMLAL2, AVUMLSL2, AVUMULL2,
+			AVSABAL2, AVUABAL2, AVSABDL2, AVUABDL2:
 			Q = 1
 		}
 		switch pack(Q, at, af) {
@@ -5755,7 +5823,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 
 		o1 |= ((Q & 1) << 30) | (uint32(r&31) << 16) | (uint32(index&15) << 11) | (uint32(rf&31) << 5) | uint32(rt&31)
 
-	case 95: /* shift: vushr/vshl/vsri/vsli/vusra/vsshr/vsrshr $shift, Vn.<T>, Vd.<T>; narrowing shift: vshrn[2] $shift, Vn.<Ta>, Vd.<Tb>; trunc: vxtn/v{s,u}qxt{n,un}/vfcvtn[2] Vn.<Ta>, Vd.<Tb> */
+	case 95: /* shift: vushr/vshl/vsri/vsli/vusra/vsshr/v(s|u)rshr/v(s|u)sra/v(s|u)rsra $shift, Vn.<T>, Vd.<T>; narrowing shift: v[r]shrn[2]/vsq[r]shr[u]n[2]/vuq[r]shrn[2] $shift, Vn.<Ta>, Vd.<Tb>; trunc: vxtn/v{s,u}qxt{n,un}/vfcvtn[2] Vn.<Ta>, Vd.<Tb> */
 		at := int((p.To.Reg >> 5) & 15)
 		rt := int((p.To.Reg) & 31)
 		var af, rf, shift int
@@ -5777,7 +5845,8 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			shift = int(p.From.Offset)
 		}
 
-		narrow := trunc || p.As == AVSHRN || p.As == AVSHRN2
+		narrowShift, narrowShiftHi := isNarrowShift(p.As)
+		narrow := trunc || narrowShift
 		if af != at && !narrow {
 			c.ctxt.Diag("invalid arrangement on op Vn.<T>, Vd.<T>: %v", p)
 			at = af
@@ -5817,7 +5886,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 		if narrow {
 			wantQ := uint32(0)
 			if p.As == AVXTN2 || p.As == AVSQXTN2 || p.As == AVSQXTUN2 ||
-				p.As == AVUQXTN2 || p.As == AVFCVTN2 || p.As == AVSHRN2 {
+				p.As == AVUQXTN2 || p.As == AVFCVTN2 || narrowShiftHi {
 				wantQ = 1
 			}
 			if Q != wantQ || atwice != af {
@@ -5836,7 +5905,9 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 
 		// Shift instructions: encode immediate from shift amount.
 		switch p.As {
-		case AVUSHR, AVSRI, AVUSRA, AVSSHR, AVSRSHR, AVSHRN, AVSHRN2:
+		case AVUSHR, AVSRI, AVUSRA, AVSSHR, AVSRSHR, AVURSHR, AVSSRA, AVSRSRA, AVURSRA,
+			AVSHRN, AVSHRN2, AVRSHRN, AVRSHRN2, AVSQSHRN, AVSQSHRN2, AVSQRSHRN, AVSQRSHRN2,
+			AVSQSHRUN, AVSQSHRUN2, AVSQRSHRUN, AVSQRSHRUN2, AVUQSHRN, AVUQSHRN2, AVUQRSHRN, AVUQRSHRN2:
 			imm := esize*2 - shift
 			if imm < esize || imm > imax {
 				c.ctxt.Diag("shift out of range: %v", p)
@@ -6383,6 +6454,45 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			}
 		}
 		o1 |= uint32(p.From.Reg&31)<<5 | uint32(p.To.Reg&31)
+
+	case 112: /* pairwise long: v(s|u)addlp/v(s|u)adalp Vn.<Tb>, Vd.<Ta> */
+		af := uint8((p.From.Reg >> 5) & 15)
+		at := uint8((p.To.Reg >> 5) & 15)
+		var Q, size uint32
+		switch pack(0, af, at) {
+		case pack(0, ARNG_8B, ARNG_4H):
+			Q, size = 0, 0
+		case pack(0, ARNG_16B, ARNG_8H):
+			Q, size = 1, 0
+		case pack(0, ARNG_4H, ARNG_2S):
+			Q, size = 0, 1
+		case pack(0, ARNG_8H, ARNG_4S):
+			Q, size = 1, 1
+		case pack(0, ARNG_2S, ARNG_1D):
+			Q, size = 0, 2
+		case pack(0, ARNG_4S, ARNG_2D):
+			Q, size = 1, 2
+		default:
+			c.ctxt.Diag("invalid arrangement: %v", p)
+		}
+		o1 = c.oprrr(p, p.As, p.To.Reg, p.From.Reg, obj.REG_NONE)
+		o1 |= (Q&1)<<30 | (size&3)<<22
+
+	case 113: /* dot product: vsdot/vudot/vusdot Vm.<Tb>, Vn.<Tb>, Vd.<Ta> */
+		af := uint8((p.From.Reg >> 5) & 15)
+		at := uint8((p.To.Reg >> 5) & 15)
+		a := uint8((p.Reg >> 5) & 15)
+		var Q uint32
+		switch {
+		case af == ARNG_8B && a == ARNG_8B && at == ARNG_2S:
+			Q = 0
+		case af == ARNG_16B && a == ARNG_16B && at == ARNG_4S:
+			Q = 1
+		default:
+			c.ctxt.Diag("invalid arrangement: %v", p)
+		}
+		o1 = c.oprrr(p, p.As, p.To.Reg, p.Reg, p.From.Reg)
+		o1 |= (Q & 1) << 30
 
 	case 127:
 		// Generic SVE instruction encoding
@@ -7313,6 +7423,57 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As, rd, rn, rm int16) uint32 {
 	case AVUADDW, AVUADDW2:
 		op = ASIMDDIFF(1, 0x1)
 
+	case AVSABAL, AVSABAL2:
+		op = ASIMDDIFF(0, 0x5)
+
+	case AVUABAL, AVUABAL2:
+		op = ASIMDDIFF(1, 0x5)
+
+	case AVSABDL, AVSABDL2:
+		op = ASIMDDIFF(0, 0x7)
+
+	case AVUABDL, AVUABDL2:
+		op = ASIMDDIFF(1, 0x7)
+
+	case AVSABA:
+		op = ASIMDSAME(0, 0, 0x0F)
+
+	case AVUABA:
+		op = ASIMDSAME(1, 0, 0x0F)
+
+	case AVSABD:
+		op = ASIMDSAME(0, 0, 0x0E)
+
+	case AVUABD:
+		op = ASIMDSAME(1, 0, 0x0E)
+
+	case AVSQDMULH:
+		op = ASIMDSAME(0, 0, 0x16)
+
+	case AVSQRDMULH:
+		op = ASIMDSAME(1, 0, 0x16)
+
+	case AVSADDLP:
+		op = ASIMDMISC(0, 0, 0x02)
+
+	case AVUADDLP:
+		op = ASIMDMISC(1, 0, 0x02)
+
+	case AVSADALP:
+		op = ASIMDMISC(0, 0, 0x06)
+
+	case AVUADALP:
+		op = ASIMDMISC(1, 0, 0x06)
+
+	case AVSDOT:
+		op = ASIMDDOT(0, 0x2)
+
+	case AVUDOT:
+		op = ASIMDDOT(1, 0x2)
+
+	case AVUSDOT:
+		op = ASIMDDOT(0, 0x3)
+
 	case AVTRN1:
 		op = ASIMDPERM(0x2)
 
@@ -7556,6 +7717,18 @@ func (c *ctxt7) opirr(p *obj.Prog, a obj.As) uint32 {
 	case AVSRSHR:
 		return ASIMDSHF(0, 0x04)
 
+	case AVURSHR:
+		return ASIMDSHF(1, 0x04)
+
+	case AVSSRA:
+		return ASIMDSHF(0, 0x02)
+
+	case AVSRSRA:
+		return ASIMDSHF(0, 0x06)
+
+	case AVURSRA:
+		return ASIMDSHF(1, 0x06)
+
 	case AVSHL:
 		return ASIMDSHF(0, 0x0A)
 
@@ -7567,6 +7740,27 @@ func (c *ctxt7) opirr(p *obj.Prog, a obj.As) uint32 {
 
 	case AVSHRN, AVSHRN2:
 		return ASIMDSHF(0, 0x10)
+
+	case AVRSHRN, AVRSHRN2:
+		return ASIMDSHF(0, 0x11)
+
+	case AVSQSHRN, AVSQSHRN2:
+		return ASIMDSHF(0, 0x12)
+
+	case AVSQRSHRN, AVSQRSHRN2:
+		return ASIMDSHF(0, 0x13)
+
+	case AVSQSHRUN, AVSQSHRUN2:
+		return ASIMDSHF(1, 0x10)
+
+	case AVSQRSHRUN, AVSQRSHRUN2:
+		return ASIMDSHF(1, 0x11)
+
+	case AVUQSHRN, AVUQSHRN2:
+		return ASIMDSHF(1, 0x12)
+
+	case AVUQRSHRN, AVUQRSHRN2:
+		return ASIMDSHF(1, 0x13)
 
 	case AVXTN, AVXTN2:
 		return ASIMDMISC(0, 0, 0x12)

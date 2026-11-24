@@ -159,6 +159,162 @@ TEXT	foo(SB), DUPOK|NOSPLIT, $-8
 	VSRHADD	V0.S4, V1.S4, V2.S4            // 2214a04e
 	VUHADD	V0.S4, V1.S4, V2.S4            // 2204a06e
 	VURHADD	V0.S4, V1.S4, V2.S4            // 2214a06e
+	VSABA	V30.B8, V17.B8, V5.B8              // 257e3e0e
+	VSABA	V30.B16, V17.B16, V5.B16           // 257e3e4e
+	VSABA	V30.H4, V17.H4, V5.H4              // 257e7e0e
+	VSABA	V30.H8, V17.H8, V5.H8              // 257e7e4e
+	VSABA	V30.S2, V17.S2, V5.S2              // 257ebe0e
+	VSABA	V30.S4, V17.S4, V5.S4              // 257ebe4e
+	VUABA	V30.B8, V17.B8, V5.B8              // 257e3e2e
+	VUABA	V30.B16, V17.B16, V5.B16           // 257e3e6e
+	VUABA	V30.H4, V17.H4, V5.H4              // 257e7e2e
+	VUABA	V30.H8, V17.H8, V5.H8              // 257e7e6e
+	VUABA	V30.S2, V17.S2, V5.S2              // 257ebe2e
+	VUABA	V30.S4, V17.S4, V5.S4              // 257ebe6e
+	VSABD	V30.B8, V17.B8, V5.B8              // 25763e0e
+	VSABD	V30.B16, V17.B16, V5.B16           // 25763e4e
+	VSABD	V30.H4, V17.H4, V5.H4              // 25767e0e
+	VSABD	V30.H8, V17.H8, V5.H8              // 25767e4e
+	VSABD	V30.S2, V17.S2, V5.S2              // 2576be0e
+	VSABD	V30.S4, V17.S4, V5.S4              // 2576be4e
+	VUABD	V30.B8, V17.B8, V5.B8              // 25763e2e
+	VUABD	V30.B16, V17.B16, V5.B16           // 25763e6e
+	VUABD	V30.H4, V17.H4, V5.H4              // 25767e2e
+	VUABD	V30.H8, V17.H8, V5.H8              // 25767e6e
+	VUABD	V30.S2, V17.S2, V5.S2              // 2576be2e
+	VUABD	V30.S4, V17.S4, V5.S4              // 2576be6e
+	VSQDMULH	V30.H4, V17.H4, V5.H4           // 25b67e0e
+	VSQDMULH	V30.H8, V17.H8, V5.H8           // 25b67e4e
+	VSQDMULH	V30.S2, V17.S2, V5.S2           // 25b6be0e
+	VSQDMULH	V30.S4, V17.S4, V5.S4           // 25b6be4e
+	VSQRDMULH	V30.H4, V17.H4, V5.H4          // 25b67e2e
+	VSQRDMULH	V30.H8, V17.H8, V5.H8          // 25b67e6e
+	VSQRDMULH	V30.S2, V17.S2, V5.S2          // 25b6be2e
+	VSQRDMULH	V30.S4, V17.S4, V5.S4          // 25b6be6e
+	VSABAL	V30.B8, V17.B8, V5.H8             // 25523e0e
+	VSABAL2	V30.B16, V17.B16, V5.H8          // 25523e4e
+	VSABAL	V30.H4, V17.H4, V5.S4             // 25527e0e
+	VSABAL2	V30.H8, V17.H8, V5.S4            // 25527e4e
+	VSABAL	V30.S2, V17.S2, V5.D2             // 2552be0e
+	VSABAL2	V30.S4, V17.S4, V5.D2            // 2552be4e
+	VUABAL	V30.B8, V17.B8, V5.H8             // 25523e2e
+	VUABAL2	V30.B16, V17.B16, V5.H8          // 25523e6e
+	VUABAL	V30.H4, V17.H4, V5.S4             // 25527e2e
+	VUABAL2	V30.H8, V17.H8, V5.S4            // 25527e6e
+	VUABAL	V30.S2, V17.S2, V5.D2             // 2552be2e
+	VUABAL2	V30.S4, V17.S4, V5.D2            // 2552be6e
+	VSABDL	V30.B8, V17.B8, V5.H8             // 25723e0e
+	VSABDL2	V30.B16, V17.B16, V5.H8          // 25723e4e
+	VSABDL	V30.H4, V17.H4, V5.S4             // 25727e0e
+	VSABDL2	V30.H8, V17.H8, V5.S4            // 25727e4e
+	VSABDL	V30.S2, V17.S2, V5.D2             // 2572be0e
+	VSABDL2	V30.S4, V17.S4, V5.D2            // 2572be4e
+	VUABDL	V30.B8, V17.B8, V5.H8             // 25723e2e
+	VUABDL2	V30.B16, V17.B16, V5.H8          // 25723e6e
+	VUABDL	V30.H4, V17.H4, V5.S4             // 25727e2e
+	VUABDL2	V30.H8, V17.H8, V5.S4            // 25727e6e
+	VUABDL	V30.S2, V17.S2, V5.D2             // 2572be2e
+	VUABDL2	V30.S4, V17.S4, V5.D2            // 2572be6e
+	VSADDLP	V17.B8, V5.H4                    // 252a200e
+	VSADDLP	V17.B16, V5.H8                   // 252a204e
+	VSADDLP	V17.H4, V5.S2                    // 252a600e
+	VSADDLP	V17.H8, V5.S4                    // 252a604e
+	VSADDLP	V17.S2, V5.D1                    // 252aa00e
+	VSADDLP	V17.S4, V5.D2                    // 252aa04e
+	VUADDLP	V17.B8, V5.H4                    // 252a202e
+	VUADDLP	V17.B16, V5.H8                   // 252a206e
+	VUADDLP	V17.H4, V5.S2                    // 252a602e
+	VUADDLP	V17.H8, V5.S4                    // 252a606e
+	VUADDLP	V17.S2, V5.D1                    // 252aa02e
+	VUADDLP	V17.S4, V5.D2                    // 252aa06e
+	VSADALP	V17.B8, V5.H4                    // 256a200e
+	VSADALP	V17.B16, V5.H8                   // 256a204e
+	VSADALP	V17.H4, V5.S2                    // 256a600e
+	VSADALP	V17.H8, V5.S4                    // 256a604e
+	VSADALP	V17.S2, V5.D1                    // 256aa00e
+	VSADALP	V17.S4, V5.D2                    // 256aa04e
+	VUADALP	V17.B8, V5.H4                    // 256a202e
+	VUADALP	V17.B16, V5.H8                   // 256a206e
+	VUADALP	V17.H4, V5.S2                    // 256a602e
+	VUADALP	V17.H8, V5.S4                    // 256a606e
+	VUADALP	V17.S2, V5.D1                    // 256aa02e
+	VUADALP	V17.S4, V5.D2                    // 256aa06e
+	VSDOT	V30.B8, V17.B8, V5.S2              // 25969e0e
+	VSDOT	V30.B16, V17.B16, V5.S4            // 25969e4e
+	VUDOT	V30.B8, V17.B8, V5.S2              // 25969e2e
+	VUDOT	V30.B16, V17.B16, V5.S4            // 25969e6e
+	VUSDOT	V30.B8, V17.B8, V5.S2             // 259e9e0e
+	VUSDOT	V30.B16, V17.B16, V5.S4           // 259e9e4e
+	VURSHR	$1, V17.B8, V5.B8                 // 25260f2f
+	VURSHR	$8, V17.B16, V5.B16               // 2526086f
+	VURSHR	$3, V17.H4, V5.H4                 // 25261d2f
+	VURSHR	$16, V17.H8, V5.H8                // 2526106f
+	VURSHR	$7, V17.S2, V5.S2                 // 2526392f
+	VURSHR	$32, V17.S4, V5.S4                // 2526206f
+	VURSHR	$63, V17.D2, V5.D2                // 2526416f
+	VSSRA	$1, V17.B8, V5.B8                  // 25160f0f
+	VSSRA	$8, V17.B16, V5.B16                // 2516084f
+	VSSRA	$3, V17.H4, V5.H4                  // 25161d0f
+	VSSRA	$16, V17.H8, V5.H8                 // 2516104f
+	VSSRA	$7, V17.S2, V5.S2                  // 2516390f
+	VSSRA	$32, V17.S4, V5.S4                 // 2516204f
+	VSSRA	$63, V17.D2, V5.D2                 // 2516414f
+	VSRSRA	$1, V17.B8, V5.B8                 // 25360f0f
+	VSRSRA	$8, V17.B16, V5.B16               // 2536084f
+	VSRSRA	$3, V17.H4, V5.H4                 // 25361d0f
+	VSRSRA	$16, V17.H8, V5.H8                // 2536104f
+	VSRSRA	$7, V17.S2, V5.S2                 // 2536390f
+	VSRSRA	$32, V17.S4, V5.S4                // 2536204f
+	VSRSRA	$63, V17.D2, V5.D2                // 2536414f
+	VURSRA	$1, V17.B8, V5.B8                 // 25360f2f
+	VURSRA	$8, V17.B16, V5.B16               // 2536086f
+	VURSRA	$3, V17.H4, V5.H4                 // 25361d2f
+	VURSRA	$16, V17.H8, V5.H8                // 2536106f
+	VURSRA	$7, V17.S2, V5.S2                 // 2536392f
+	VURSRA	$32, V17.S4, V5.S4                // 2536206f
+	VURSRA	$63, V17.D2, V5.D2                // 2536416f
+	VRSHRN	$3, V17.H8, V5.B8                 // 258e0d0f
+	VRSHRN2	$3, V17.H8, V5.B16               // 258e0d4f
+	VRSHRN	$16, V17.S4, V5.H4                // 258e100f
+	VRSHRN2	$16, V17.S4, V5.H8               // 258e104f
+	VRSHRN	$1, V17.D2, V5.S2                 // 258e3f0f
+	VRSHRN2	$1, V17.D2, V5.S4                // 258e3f4f
+	VSQSHRN	$3, V17.H8, V5.B8                // 25960d0f
+	VSQSHRN2	$3, V17.H8, V5.B16              // 25960d4f
+	VSQSHRN	$16, V17.S4, V5.H4               // 2596100f
+	VSQSHRN2	$16, V17.S4, V5.H8              // 2596104f
+	VSQSHRN	$1, V17.D2, V5.S2                // 25963f0f
+	VSQSHRN2	$1, V17.D2, V5.S4               // 25963f4f
+	VSQRSHRN	$3, V17.H8, V5.B8               // 259e0d0f
+	VSQRSHRN2	$3, V17.H8, V5.B16             // 259e0d4f
+	VSQRSHRN	$16, V17.S4, V5.H4              // 259e100f
+	VSQRSHRN2	$16, V17.S4, V5.H8             // 259e104f
+	VSQRSHRN	$1, V17.D2, V5.S2               // 259e3f0f
+	VSQRSHRN2	$1, V17.D2, V5.S4              // 259e3f4f
+	VSQSHRUN	$3, V17.H8, V5.B8               // 25860d2f
+	VSQSHRUN2	$3, V17.H8, V5.B16             // 25860d6f
+	VSQSHRUN	$16, V17.S4, V5.H4              // 2586102f
+	VSQSHRUN2	$16, V17.S4, V5.H8             // 2586106f
+	VSQSHRUN	$1, V17.D2, V5.S2               // 25863f2f
+	VSQSHRUN2	$1, V17.D2, V5.S4              // 25863f6f
+	VSQRSHRUN	$3, V17.H8, V5.B8              // 258e0d2f
+	VSQRSHRUN2	$3, V17.H8, V5.B16            // 258e0d6f
+	VSQRSHRUN	$16, V17.S4, V5.H4             // 258e102f
+	VSQRSHRUN2	$16, V17.S4, V5.H8            // 258e106f
+	VSQRSHRUN	$1, V17.D2, V5.S2              // 258e3f2f
+	VSQRSHRUN2	$1, V17.D2, V5.S4             // 258e3f6f
+	VUQSHRN	$3, V17.H8, V5.B8                // 25960d2f
+	VUQSHRN2	$3, V17.H8, V5.B16              // 25960d6f
+	VUQSHRN	$16, V17.S4, V5.H4               // 2596102f
+	VUQSHRN2	$16, V17.S4, V5.H8              // 2596106f
+	VUQSHRN	$1, V17.D2, V5.S2                // 25963f2f
+	VUQSHRN2	$1, V17.D2, V5.S4               // 25963f6f
+	VUQRSHRN	$3, V17.H8, V5.B8               // 259e0d2f
+	VUQRSHRN2	$3, V17.H8, V5.B16             // 259e0d6f
+	VUQRSHRN	$16, V17.S4, V5.H4              // 259e102f
+	VUQRSHRN2	$16, V17.S4, V5.H8             // 259e106f
+	VUQRSHRN	$1, V17.D2, V5.S2               // 259e3f2f
+	VUQRSHRN2	$1, V17.D2, V5.S4              // 259e3f6f
 	VEOR	V0.B16, V1.B16, V0.B16          // 201c206e
 	VADDV	V0.S4, V0                       // 00b8b14e
 	VMOVI	$82, V0.B16                     // 40e6024f
