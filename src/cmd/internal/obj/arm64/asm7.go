@@ -3389,6 +3389,8 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVUABD, t)
 			oprangeset(AVSQDMULH, t)
 			oprangeset(AVSQRDMULH, t)
+			oprangeset(AVSRSHL, t)
+			oprangeset(AVURSHL, t)
 
 		case AVCMEQ:
 			oprangeset(AVCMGE, t)
@@ -7452,6 +7454,12 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As, rd, rn, rm int16) uint32 {
 
 	case AVSQRDMULH:
 		op = ASIMDSAME(1, 0, 0x16)
+
+	case AVSRSHL:
+		op = ASIMDSAME(0, 0, 0x0A)
+
+	case AVURSHL:
+		op = ASIMDSAME(1, 0, 0x0A)
 
 	case AVSADDLP:
 		op = ASIMDMISC(0, 0, 0x02)

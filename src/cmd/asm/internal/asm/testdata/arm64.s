@@ -191,6 +191,20 @@ TEXT	foo(SB), DUPOK|NOSPLIT, $-8
 	VSQRDMULH	V30.H8, V17.H8, V5.H8          // 25b67e6e
 	VSQRDMULH	V30.S2, V17.S2, V5.S2          // 25b6be2e
 	VSQRDMULH	V30.S4, V17.S4, V5.S4          // 25b6be6e
+	VSRSHL	V30.B8, V17.B8, V5.B8             // 25563e0e
+	VSRSHL	V30.B16, V17.B16, V5.B16          // 25563e4e
+	VSRSHL	V30.H4, V17.H4, V5.H4             // 25567e0e
+	VSRSHL	V30.H8, V17.H8, V5.H8             // 25567e4e
+	VSRSHL	V30.S2, V17.S2, V5.S2             // 2556be0e
+	VSRSHL	V30.S4, V17.S4, V5.S4             // 2556be4e
+	VSRSHL	V30.D2, V17.D2, V5.D2             // 2556fe4e
+	VURSHL	V30.B8, V17.B8, V5.B8             // 25563e2e
+	VURSHL	V30.B16, V17.B16, V5.B16          // 25563e6e
+	VURSHL	V30.H4, V17.H4, V5.H4             // 25567e2e
+	VURSHL	V30.H8, V17.H8, V5.H8             // 25567e6e
+	VURSHL	V30.S2, V17.S2, V5.S2             // 2556be2e
+	VURSHL	V30.S4, V17.S4, V5.S4             // 2556be6e
+	VURSHL	V30.D2, V17.D2, V5.D2             // 2556fe6e
 	VSABAL	V30.B8, V17.B8, V5.H8             // 25523e0e
 	VSABAL2	V30.B16, V17.B16, V5.H8          // 25523e4e
 	VSABAL	V30.H4, V17.H4, V5.S4             // 25527e0e

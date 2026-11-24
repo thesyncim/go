@@ -749,6 +749,8 @@ var Anames = []string{
 	"VUQSHRN2",
 	"VUQRSHRN",
 	"VUQRSHRN2",
+	"VSRSHL",
+	"VURSHL",
 	"WFE",
 	"WFI",
 	"WORD",
