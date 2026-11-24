@@ -1615,7 +1615,9 @@ func TestWaitingGCentralCacheGC(t *testing.T) {
 
 // BenchmarkChanFanOutGC hands work to parked goroutines over a channel and
 // waits for them with a WaitGroup while collections run, the pattern that
-// makes waitingGs migrate between Ps.
+// makes waitingGs migrate between Ps. It reports the fraction of GC cycles
+// after which the loop allocated at all: each such allocation would have
+// to refill an mcache span and pay down sweep debt.
 func BenchmarkChanFanOutGC(b *testing.B) {
 	workers := runtime.GOMAXPROCS(0)
 	work := make(chan struct{})
@@ -1628,20 +1630,35 @@ func BenchmarkChanFanOutGC(b *testing.B) {
 		}()
 	}
 	defer close(work)
-	var before, after runtime.MemStats
-	runtime.ReadMemStats(&before)
-	gcs := 0
-	for i := 0; b.Loop(); i++ {
-		if i%256 == 0 {
-			runtime.GC()
-			gcs++
-		}
+	round := func() {
 		wg.Add(workers)
 		for range workers {
 			work <- struct{}{}
 		}
 		wg.Wait()
 	}
-	runtime.ReadMemStats(&after)
-	b.ReportMetric(float64(after.Mallocs-before.Mallocs)/float64(gcs), "mallocs/GC")
+	for range 1024 {
+		round()
+	}
+	var ms runtime.MemStats
+	var mallocs uint64
+	cycles, allocating := 0, 0
+	for i := 0; b.Loop(); i++ {
+		if i%256 == 0 {
+			if cycles > 0 {
+				runtime.ReadMemStats(&ms)
+				if ms.Mallocs != mallocs {
+					allocating++
+				}
+			}
+			runtime.GC()
+			runtime.ReadMemStats(&ms)
+			mallocs = ms.Mallocs
+			cycles++
+		}
+		round()
+	}
+	if cycles > 1 {
+		b.ReportMetric(float64(allocating)/float64(cycles-1), "allocating-cycles/GC")
+	}
 }
