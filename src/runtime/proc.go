@@ -521,9 +521,20 @@ func acquireWaitingG(typ waitingGType) *waitingG {
 			pp.waitingGCache = append(pp.waitingGCache, wg)
 		}
 		unlock(&sched.waitingGLock)
-		// If the central cache is empty, allocate a new one.
+		// If the central cache is empty, allocate a batch.
+		//
+		// A woken goroutine usually runs on a different P than
+		// the one it blocked on, and releases its waitingG there,
+		// so a P that blocks more goroutines than it runs woken
+		// ones keeps running out. Allocating one at a time would
+		// have it allocate again on almost every refill, and right
+		// after a GC each of those allocations may have to refill
+		// an mcache span and pay down sweep debt, which can mean
+		// sweeping most of the heap when the heap is near its goal.
 		if len(pp.waitingGCache) == 0 {
-			pp.waitingGCache = append(pp.waitingGCache, new(waitingG))
+			for len(pp.waitingGCache) < cap(pp.waitingGCache)/2 {
+				pp.waitingGCache = append(pp.waitingGCache, new(waitingG))
+			}
 		}
 	}
 	n := len(pp.waitingGCache)

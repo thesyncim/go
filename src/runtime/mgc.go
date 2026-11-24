@@ -2215,17 +2215,27 @@ func clearpools() {
 		atomicstorep(p, nil)
 	}
 
-	// Clear central waitingG cache.
+	// Trim central waitingG cache to what one refill of every P takes.
 	// Leave per-P caches alone, they have strictly bounded size.
-	// Disconnect cached list before dropping it on the floor,
+	// Woken goroutines often run on a different P than the one they
+	// blocked on, so waitingGs migrate between Ps through the central
+	// cache. Dropping all of it would make Ps that block goroutines
+	// allocate new waitingGs right after every GC.
+	// Disconnect the rest of the list before dropping it on the floor,
 	// so that a dangling ref to one entry does not pin all of them.
 	lock(&sched.waitingGLock)
-	var wg, wgnext *waitingG
-	for wg = sched.waitingGCache; wg != nil; wg = wgnext {
+	var wg, wgnext, last *waitingG
+	wg = sched.waitingGCache
+	for keep := int(gomaxprocs) * (len((*p)(nil).waitingGBuf) / 2); wg != nil && keep > 0; keep-- {
+		last, wg = wg, wg.next
+	}
+	if last != nil {
+		last.next = nil
+	}
+	for ; wg != nil; wg = wgnext {
 		wgnext = wg.next
 		wg.next = nil
 	}
-	sched.waitingGCache = nil
 	unlock(&sched.waitingGLock)
 
 	// Clear central defer pool.
