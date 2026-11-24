@@ -246,6 +246,8 @@ func init() {
 		{name: "MulAddUint8x16", argLength: 3},
 		{name: "MulAddUint16x8", argLength: 3},
 		{name: "MulAddUint32x4", argLength: 3},
+		{name: "MulFixedPointRoundedInt16x8", argLength: 2, commutative: true},
+		{name: "MulFixedPointRoundedInt32x4", argLength: 2, commutative: true},
 		{name: "MulFloat32x4", argLength: 2, commutative: true},
 		{name: "MulFloat64x2", argLength: 2, commutative: true},
 		{name: "MulInt8x16", argLength: 2, commutative: true},

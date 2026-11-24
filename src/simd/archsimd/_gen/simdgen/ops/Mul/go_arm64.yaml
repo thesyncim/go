@@ -10,10 +10,15 @@
   - *any
 
 # Multiply long signed (SMULL)
+# x.Add(y.MulWiden(z)) fuses into VSMLAL, and into VSMLAL2 for the
+# high-indexed elements.
 - go: MulWiden
   signed: true
   asm: "VSMULL"
   hiHalfAsm: "VSMULL2"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y z)) && d.Uses == 1 => (VSMLAL%a x y z)"
+  - !string "(VADD%w x d:(VSMULL2_%a y z)) && d.Uses == 1 => (VSMLAL2_%a x y z)"
   in:
   - go: $t
     base: int
@@ -24,10 +29,15 @@
     base: int
 
 # Multiply long unsigned (UMULL)
+# x.Add(y.MulWiden(z)) fuses into VUMLAL, and into VUMLAL2 for the
+# high-indexed elements.
 - go: MulWiden
   signed: false
   asm: "VUMULL"
   hiHalfAsm: "VUMULL2"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y z)) && d.Uses == 1 => (VUMLAL%a x y z)"
+  - !string "(VADD%w x d:(VUMULL2_%a y z)) && d.Uses == 1 => (VUMLAL2_%a x y z)"
   in:
   - go: $t
     base: uint
@@ -36,3 +46,44 @@
   out:
   - go: $u
     base: uint
+
+# Multiply-add long — VSMLAL, VUMLAL
+- go: mulWidenAccumulate
+  asm: "VSMLAL"
+  hiHalfAsm: "VSMLAL2"
+  in:
+  - go: $u
+    base: int
+  - &smlal
+    go: $t
+    base: int
+  - *smlal
+  out:
+  - go: $u
+    base: int
+
+- go: mulWidenAccumulate
+  asm: "VUMLAL"
+  hiHalfAsm: "VUMLAL2"
+  in:
+  - go: $u
+    base: uint
+  - &umlal
+    go: $t
+    base: uint
+  - *umlal
+  out:
+  - go: $u
+    base: uint
+
+# Signed saturating rounding doubling multiply returning high half — VSQRDMULH
+- go: MulFixedPointRounded
+  asm: "VSQRDMULH"
+  in:
+  - &sqrdmulh
+    go: $t
+    base: int
+    elemBits: 16|32
+  - *sqrdmulh
+  out:
+  - *sqrdmulh

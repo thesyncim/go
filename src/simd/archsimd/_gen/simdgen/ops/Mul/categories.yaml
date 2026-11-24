@@ -12,6 +12,18 @@
   commutative: true
   documentation: !string |-
     // NAME multiplies elements and stores the high part of the result.
+- go: MulFixedPointRounded
+  commutative: true
+  documentation: !string |-
+    // NAME multiplies signed fixed-point elements, rounding and saturating the result.
+# The accumulating form of MulWiden, as a machine op only, for a peephole
+# rule that fuses x.Add(y.MulWiden(z)).
+- go: mulWidenAccumulate
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+  documentation: !string |-
+    // NAME adds the widened products of corresponding low-indexed elements of y and z to x.
 - go: MulWiden
   commutative: true
   documentation: !string |-

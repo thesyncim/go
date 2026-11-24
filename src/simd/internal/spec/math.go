@@ -464,6 +464,27 @@ func MulHigh[E Ints | Uints, W Width](x, y Vec[E, W]) (z Vec[E, W]) {
 	return map2[E, W, E, W](x, y, mulHigh[E])
 }
 
+// MulFixedPointRounded multiplies x and y as signed fixed-point numbers whose
+// bits other than the sign bit are all fractional (Q15 for int16 elements and
+// Q31 for int32 elements), rounding the product to nearest, with ties rounded
+// up, and saturating it.
+//
+//	z[i] = saturate((2*x[i]*y[i] + 1<<({{.xN}}-1)) >> {{.xN}})
+//
+// The product only saturates when both x[i] and y[i] are Min{{title .xE}}.
+//
+//specgen:commutative
+//specgen:experiment
+func MulFixedPointRounded[E int16 | int32, W Width](x, y Vec[E, W]) (z Vec[E, W]) {
+	return map2[E, W, E, W](x, y, func(x, y E) E {
+		n := elemBits[E]()
+		// (2*p + 2^(n-1)) >> n == (p + 2^(n-2)) >> (n-1), and the latter
+		// can't overflow int64.
+		p := int64(x) * int64(y)
+		return saturateS[E]((p + 1<<(n-2)) >> (n - 1))
+	})
+}
+
 // MulAddInts returns x * y + z elementwise.
 //
 //	w[i] = x[i] * y[i] + z[i]

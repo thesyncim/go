@@ -961,3 +961,19 @@ func addPairsWiden(x archsimd.Uint8x16) archsimd.Uint16x8 {
 	// arm64:`VUADDLP V\d+\.B16, V\d+\.H8`
 	return x.AddPairsWiden()
 }
+
+// Widening multiplies fuse with an accumulating Add.
+func mulWidenAccumulate(acc archsimd.Int32x4, x, y archsimd.Int16x8) archsimd.Int32x4 {
+	// arm64:`VSMLAL V\d+\.H4, V\d+\.H4, V\d+\.S4` -`VSMULL` -`VADD`
+	return acc.Add(x.MulWiden(y))
+}
+
+func mulWidenAccumulateHi(acc archsimd.Uint16x8, x, y archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUMLAL2 V\d+\.B16, V\d+\.B16, V\d+\.H8` -`VUMULL` -`VADD` -`VDUP`
+	return acc.Add(x.HiToLo().MulWiden(y.HiToLo()))
+}
+
+func mulFixedPointRounded(x, y archsimd.Int16x8) archsimd.Int16x8 {
+	// arm64:`VSQRDMULH V\d+\.H8, V\d+\.H8, V\d+\.H8`
+	return x.MulFixedPointRounded(y)
+}

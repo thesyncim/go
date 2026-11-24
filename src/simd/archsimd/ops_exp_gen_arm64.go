@@ -256,6 +256,32 @@ func (x Uint16x8) LeadingSignBits() Uint16x8
 // Asm: VCLS
 func (x Uint32x4) LeadingSignBits() Uint32x4
 
+/* MulFixedPointRounded */
+
+// MulFixedPointRounded multiplies x and y as signed fixed-point numbers whose
+// bits other than the sign bit are all fractional (Q15 for int16 elements and
+// Q31 for int32 elements), rounding the product to nearest, with ties rounded
+// up, and saturating it.
+//
+//	z[i] = saturate((2*x[i]*y[i] + 1<<(16-1)) >> 16)
+//
+// The product only saturates when both x[i] and y[i] are MinInt16.
+//
+// Asm: VSQRDMULH
+func (x Int16x8) MulFixedPointRounded(y Int16x8) (z Int16x8)
+
+// MulFixedPointRounded multiplies x and y as signed fixed-point numbers whose
+// bits other than the sign bit are all fractional (Q15 for int16 elements and
+// Q31 for int32 elements), rounding the product to nearest, with ties rounded
+// up, and saturating it.
+//
+//	z[i] = saturate((2*x[i]*y[i] + 1<<(32-1)) >> 32)
+//
+// The product only saturates when both x[i] and y[i] are MinInt32.
+//
+// Asm: VSQRDMULH
+func (x Int32x4) MulFixedPointRounded(y Int32x4) (z Int32x4)
+
 /* Scale */
 
 // Scale shifts each element in x by the signed value of the least significant byte
