@@ -17,6 +17,28 @@
   commutative: false
   documentation: !string |-
     // NAME computes the absolute value of each element.
+- go: AbsDiff
+  commutative: true
+  documentation: !string |-
+    // NAME computes the absolute difference of corresponding elements.
+- go: AbsDiffWiden
+  commutative: true
+  documentation: !string |-
+    // NAME computes the absolute difference of corresponding low-indexed elements, widening the result.
+# The accumulating forms of AbsDiff and AbsDiffWiden, as machine ops only, for
+# peephole rules that fuse x.Add(y.AbsDiff(z)) and x.Add(y.AbsDiffWiden(z)).
+- go: absDiffAccumulate
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+  documentation: !string |-
+    // NAME adds the absolute difference of corresponding elements of y and z to x.
+- go: absDiffWidenAccumulate
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+  documentation: !string |-
+    // NAME adds the widened absolute difference of corresponding low-indexed elements of y and z to x.
 - go: MulSign
   commutative: false
   documentation: !string |-

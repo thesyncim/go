@@ -230,6 +230,8 @@ func expandRule(rule string, data tplRuleData, elemBits int) string {
 //
 //	%s - lane size letter (B, H, S, D)
 //	%a - arrangement suffix (16B, 8H, 4S, 2D) for neon instructions
+//	%w - arrangement suffix of elements twice as wide (8H, 4S, 2D), for the
+//	     result of a neon long instruction
 //	%b - bits per lane (8, 16, 32, 64)
 //	%r - register-width letter of scalar move ops (B, H, W, D)
 func expandFormatSpecifiers(s string, elemBits int) string {
@@ -239,6 +241,7 @@ func expandFormatSpecifiers(s string, elemBits int) string {
 	s = strings.ReplaceAll(s, "%s", elemLetters[elemBits])
 	s = strings.ReplaceAll(s, "%r", regLetters[elemBits])
 	s = strings.ReplaceAll(s, "%a", arrangements[elemBits])
+	s = strings.ReplaceAll(s, "%w", arrangements[elemBits*2])
 	s = strings.ReplaceAll(s, "%b", fmt.Sprintf("%d", elemBits))
 	return s
 }
@@ -1107,6 +1110,10 @@ func generateHiHalfFoldingRules(ops []Operation) []string {
 			case 2:
 				// Binary Long: both inputs are from HiToLo, fold into hiHalf variant.
 				rules = append(rules, fmt.Sprintf("(%s (VDUPDextr [1] x) (VDUPDextr [1] y)) => (%s x y)\n", asm, asm2))
+			case 3:
+				// Accumulating binary Long (e.g., UABAL): both non-accumulator
+				// inputs are from HiToLo, fold into hiHalf variant.
+				rules = append(rules, fmt.Sprintf("(%s acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (%s acc x y)\n", asm, asm2))
 			default:
 				panic("unsupported yet folding long ops cases")
 			}

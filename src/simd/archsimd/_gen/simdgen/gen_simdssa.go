@@ -260,8 +260,15 @@ func writeSIMDSSA(buffer *bytes.Buffer, ops []Operation) {
 			// NEON ops whose operands have different arrangements need
 			// a helper that knows the arrangement of each operand, even
 			// if they have no hi-half variant.
-			if kind := op.widthKind(); kind != "" {
-				regShape += capitalizeFirst(kind) // e.g., "v31ResultInArg0" + "Dot"
+			switch op.widthKind() {
+			case "dot":
+				regShape += "Dot" // e.g., "v31ResultInArg0" + "Dot"
+			case "long":
+				// The long ops that read only the lower half of
+				// their sources all have a hi-half variant. Those
+				// without one, such as UADDLP, read their whole
+				// source and combine pairs of elements.
+				regShape += "LongPairwise"
 			}
 		}
 		registerRegShape(regShape, caseStr, op)

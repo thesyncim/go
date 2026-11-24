@@ -589,6 +589,56 @@ func simdV21Long2(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
 	return p
 }
 
+// simdV31ResultInArg0Long generates a destructive binary long instruction,
+// e.g. UABAL V2.8B, V1.8B, V0.8H. The instruction reads lower halves of its
+// sources and accumulates into a destination with 2x element size.
+func simdV31ResultInArg0Long(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
+	src := arngHalfLanes(arrangement)
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[2].Reg(), src)
+	p.Reg = simdRegArng(v.Args[1].Reg(), src)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), arngLong(src))
+	return p
+}
+
+// simdV31ResultInArg0Long2 generates a destructive binary long "2" instruction,
+// e.g. UABAL2 V2.16B, V1.16B, V0.8H. The instruction reads upper halves of its
+// sources and accumulates into a destination with 2x element size.
+func simdV31ResultInArg0Long2(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[2].Reg(), arrangement)
+	p.Reg = simdRegArng(v.Args[1].Reg(), arrangement)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), arngLong(arngHalfLanes(arrangement)))
+	return p
+}
+
+// simdV11LongPairwise generates a pairwise long instruction,
+// e.g. UADDLP V1.16B, V0.8H. The instruction reads its whole source, and
+// the destination has half as many elements with 2x element size.
+func simdV11LongPairwise(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[0].Reg(), arrangement)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), arngLong(arngHalfLanes(arrangement)))
+	return p
+}
+
+// simdV21ResultInArg0LongPairwise generates a destructive pairwise long
+// instruction, e.g. UADALP V1.16B, V0.8H.
+func simdV21ResultInArg0LongPairwise(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[1].Reg(), arrangement)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), arngLong(arngHalfLanes(arrangement)))
+	return p
+}
+
 // simdV31ResultInArg0Dot generates a destructive dot product instruction,
 // e.g. UDOT V2.16B, V1.16B, V0.4S. The destination elements are four times
 // the size of the source elements.

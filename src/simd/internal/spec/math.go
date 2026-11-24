@@ -45,6 +45,64 @@ func AbsInt[E Ints, W Width, zE Uints](x Vec[E, W]) (z Vec[zE, W]) {
 	})
 }
 
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+//specgen:commutative
+//specgen:require z=Uint{xN}x{xL}
+//specgen:experiment
+func AbsDiff[E Ints | Uints, W Width, zE Uints](x, y Vec[E, W]) (z Vec[zE, W]) {
+	return map2[E, W, zE, W](x, y, absDiff[E, zE])
+}
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+//specgen:commutative
+//specgen:require z=Uint{xN*2}x{xL/2}
+//specgen:experiment
+func AbsDiffWiden[E Ints | Uints, W Width, zE Uints](x, y Vec[E, W]) (z Vec[zE, W]) {
+	z = makeVec[zE, W]()
+	for i := range z {
+		z[i] = absDiff[E, zE](x[i], y[i])
+	}
+	return z
+}
+
+// absDiff returns |x - y| computed exactly.
+func absDiff[E Ints | Uints, zE Uints](x, y E) zE {
+	// The difference of two N-bit values fits in an unsigned N-bit value,
+	// so computing it with wrapping arithmetic in zE is exact.
+	if x > y {
+		return zE(x) - zE(y)
+	}
+	return zE(y) - zE(x)
+}
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+//specgen:require z={xB}{xN*2}x{xL/2}
+//specgen:experiment
+func AddPairsWiden[E Ints | Uints, W Width, zE Ints | Uints](x Vec[E, W]) (z Vec[zE, W]) {
+	z = makeVec[zE, W]()
+	for i := range z {
+		z[i] = zE(x[2*i]) + zE(x[2*i+1])
+	}
+	return z
+}
+
 // Add adds x and y elementwise.
 //
 //	z[i] = x[i] + y[i]

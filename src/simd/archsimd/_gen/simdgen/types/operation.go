@@ -32,6 +32,7 @@ type RawOperation struct {
 	//	%h - the machine op name (e.g., VSSHL4S)
 	//	%s - ARM64 lane size letter (B, H, S, D)
 	//	%a - ARM64 arrangement suffix (16B, 8H, 4S, 2D)
+	//	%w - ARM64 arrangement suffix of elements twice as wide (8H, 4S, 2D)
 	//	%b - bits per lane (8, 16, 32, 64)
 	//	%r - ARM64 register-width letter of scalar move ops (B, H, W, D)
 	//

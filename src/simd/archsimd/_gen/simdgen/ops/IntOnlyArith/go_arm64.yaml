@@ -33,3 +33,125 @@
     elemBits: 8
   out:
   - *any8
+
+# Unsigned absolute difference — VUABD
+# x.Add(y.AbsDiff(z)) fuses into VUABA.
+- go: AbsDiff
+  asm: "VUABD"
+  peepholeRules:
+  - !string "(VADD%a x d:(%h y z)) && d.Uses == 1 => (VUABA%a x y z)"
+  in:
+  - &uabd
+    go: $t
+    base: uint
+    elemBits: 8|16|32
+  - *uabd
+  out:
+  - *uabd
+
+# Signed absolute difference — VSABD
+# The absolute difference is unsigned, so the result can't overflow.
+# x.Add(y.AbsDiff(z)) fuses into VSABA.
+- go: AbsDiff
+  asm: "VSABD"
+  peepholeRules:
+  - !string "(VADD%a x d:(%h y z)) && d.Uses == 1 => (VSABA%a x y z)"
+  in:
+  - &sabd
+    go: $t
+    base: int
+    elemBits: 8|16|32
+  - *sabd
+  out:
+  - go: $t
+    base: int
+    overwriteBase: uint
+
+# Absolute difference and accumulate — VUABA, VSABA
+- go: absDiffAccumulate
+  asm: "VUABA"
+  in:
+  - &uaba
+    go: $t
+    base: uint
+    elemBits: 8|16|32
+  - *uaba
+  - *uaba
+  out:
+  - *uaba
+
+- go: absDiffAccumulate
+  asm: "VSABA"
+  in:
+  - &saba
+    go: $t
+    base: int
+    elemBits: 8|16|32
+  - *saba
+  - *saba
+  out:
+  - *saba
+
+# Unsigned absolute difference long — VUABDL, VUABDL2
+# x.Add(y.AbsDiffWiden(z)) fuses into VUABAL, and into VUABAL2 for the
+# high-indexed elements.
+- go: AbsDiffWiden
+  asm: "VUABDL"
+  hiHalfAsm: "VUABDL2"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y z)) && d.Uses == 1 => (VUABAL%a x y z)"
+  - !string "(VADD%w x d:(VUABDL2_%a y z)) && d.Uses == 1 => (VUABAL2_%a x y z)"
+  in:
+  - &uabdl
+    go: $t
+    base: uint
+  - *uabdl
+  out:
+  - go: $u
+    base: uint
+
+# Signed absolute difference long — VSABDL, VSABDL2
+- go: AbsDiffWiden
+  asm: "VSABDL"
+  hiHalfAsm: "VSABDL2"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y z)) && d.Uses == 1 => (VSABAL%a x y z)"
+  - !string "(VADD%w x d:(VSABDL2_%a y z)) && d.Uses == 1 => (VSABAL2_%a x y z)"
+  in:
+  - &sabdl
+    go: $t
+    base: int
+  - *sabdl
+  out:
+  - go: $u
+    base: int
+    overwriteBase: uint
+
+# Absolute difference and accumulate long — VUABAL, VSABAL
+- go: absDiffWidenAccumulate
+  asm: "VUABAL"
+  hiHalfAsm: "VUABAL2"
+  in:
+  - go: $u
+    base: uint
+  - &uabal
+    go: $t
+    base: uint
+  - *uabal
+  out:
+  - go: $u
+    base: uint
+
+- go: absDiffWidenAccumulate
+  asm: "VSABAL"
+  hiHalfAsm: "VSABAL2"
+  in:
+  - go: $u
+    base: int
+  - &sabal
+    go: $t
+    base: int
+  - *sabal
+  out:
+  - go: $u
+    base: int

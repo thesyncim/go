@@ -116,6 +116,10 @@ var arm64RegInfoKeys = []string{
 	"v21List",
 	"v31ResultInArg0List",
 	"v31ResultInArg0Dot",
+	"v31ResultInArg0Long",
+	"v31ResultInArg0Long2",
+	"v11LongPairwise",
+	"v21ResultInArg0LongPairwise",
 }
 
 var amd64RegInfoSet = map[string]bool{

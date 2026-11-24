@@ -19,6 +19,12 @@
 (VMOVDins0 [1] dst (VDUPDextr [0] (VXTN8H y))) => (VXTN2_8H dst y)
 (VPMULL16B (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VPMULL2_16B x y)
 (VPMULL2D (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VPMULL2_2D x y)
+(VSABAL16B acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABAL2_16B acc x y)
+(VSABAL4S acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABAL2_4S acc x y)
+(VSABAL8H acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABAL2_8H acc x y)
+(VSABDL16B (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABDL2_16B x y)
+(VSABDL4S (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABDL2_4S x y)
+(VSABDL8H (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSABDL2_8H x y)
 (VSMULL16B (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSMULL2_16B x y)
 (VSMULL4S (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSMULL2_4S x y)
 (VSMULL8H (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VSMULL2_8H x y)
@@ -28,6 +34,12 @@
 (VSXTL16B (VDUPDextr [1] x)) => (VSXTL2_16B x)
 (VSXTL4S (VDUPDextr [1] x)) => (VSXTL2_4S x)
 (VSXTL8H (VDUPDextr [1] x)) => (VSXTL2_8H x)
+(VUABAL16B acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABAL2_16B acc x y)
+(VUABAL4S acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABAL2_4S acc x y)
+(VUABAL8H acc (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABAL2_8H acc x y)
+(VUABDL16B (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABDL2_16B x y)
+(VUABDL4S (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABDL2_4S x y)
+(VUABDL8H (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUABDL2_8H x y)
 (VUMULL16B (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUMULL2_16B x y)
 (VUMULL4S (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUMULL2_4S x y)
 (VUMULL8H (VDUPDextr [1] x) (VDUPDextr [1] y)) => (VUMULL2_8H x y)
@@ -43,6 +55,36 @@
 (AbsInt16x8 ...) => (VABS8H ...) // pureVreg
 (AbsInt32x4 ...) => (VABS4S ...) // pureVreg
 (AbsInt64x2 ...) => (VABS2D ...) // pureVreg
+(AbsDiffInt8x16 ...) => (VSABD16B ...) // pureVreg
+(VADD16B x d:(VSABD16B y z)) && d.Uses == 1 => (VSABA16B x y z) // peepholeRule
+(AbsDiffInt16x8 ...) => (VSABD8H ...) // pureVreg
+(VADD8H x d:(VSABD8H y z)) && d.Uses == 1 => (VSABA8H x y z) // peepholeRule
+(AbsDiffInt32x4 ...) => (VSABD4S ...) // pureVreg
+(VADD4S x d:(VSABD4S y z)) && d.Uses == 1 => (VSABA4S x y z) // peepholeRule
+(AbsDiffUint8x16 ...) => (VUABD16B ...) // pureVreg
+(VADD16B x d:(VUABD16B y z)) && d.Uses == 1 => (VUABA16B x y z) // peepholeRule
+(AbsDiffUint16x8 ...) => (VUABD8H ...) // pureVreg
+(VADD8H x d:(VUABD8H y z)) && d.Uses == 1 => (VUABA8H x y z) // peepholeRule
+(AbsDiffUint32x4 ...) => (VUABD4S ...) // pureVreg
+(VADD4S x d:(VUABD4S y z)) && d.Uses == 1 => (VUABA4S x y z) // peepholeRule
+(AbsDiffWidenInt8x16 ...) => (VSABDL16B ...) // pureVreg
+(VADD8H x d:(VSABDL16B y z)) && d.Uses == 1 => (VSABAL16B x y z) // peepholeRule
+(VADD8H x d:(VSABDL2_16B y z)) && d.Uses == 1 => (VSABAL2_16B x y z) // peepholeRule
+(AbsDiffWidenInt16x8 ...) => (VSABDL8H ...) // pureVreg
+(VADD4S x d:(VSABDL8H y z)) && d.Uses == 1 => (VSABAL8H x y z) // peepholeRule
+(VADD4S x d:(VSABDL2_8H y z)) && d.Uses == 1 => (VSABAL2_8H x y z) // peepholeRule
+(AbsDiffWidenInt32x4 ...) => (VSABDL4S ...) // pureVreg
+(VADD2D x d:(VSABDL4S y z)) && d.Uses == 1 => (VSABAL4S x y z) // peepholeRule
+(VADD2D x d:(VSABDL2_4S y z)) && d.Uses == 1 => (VSABAL2_4S x y z) // peepholeRule
+(AbsDiffWidenUint8x16 ...) => (VUABDL16B ...) // pureVreg
+(VADD8H x d:(VUABDL16B y z)) && d.Uses == 1 => (VUABAL16B x y z) // peepholeRule
+(VADD8H x d:(VUABDL2_16B y z)) && d.Uses == 1 => (VUABAL2_16B x y z) // peepholeRule
+(AbsDiffWidenUint16x8 ...) => (VUABDL8H ...) // pureVreg
+(VADD4S x d:(VUABDL8H y z)) && d.Uses == 1 => (VUABAL8H x y z) // peepholeRule
+(VADD4S x d:(VUABDL2_8H y z)) && d.Uses == 1 => (VUABAL2_8H x y z) // peepholeRule
+(AbsDiffWidenUint32x4 ...) => (VUABDL4S ...) // pureVreg
+(VADD2D x d:(VUABDL4S y z)) && d.Uses == 1 => (VUABAL4S x y z) // peepholeRule
+(VADD2D x d:(VUABDL2_4S y z)) && d.Uses == 1 => (VUABAL2_4S x y z) // peepholeRule
 (AddFloat32x4 ...) => (VFADD4S ...) // pureVreg
 (AddFloat64x2 ...) => (VFADD2D ...) // pureVreg
 (AddInt8x16 ...) => (VADD16B ...) // pureVreg
@@ -56,6 +98,18 @@
 (AddDotProductQuadrupleInt32x4 ...) => (VSDOT16B ...) // pureVreg
 (AddDotProductQuadrupleUint32x4 ...) => (VUDOT16B ...) // pureVreg
 (AddDotProductQuadrupleMixedInt32x4 ...) => (VUSDOT16B ...) // pureVreg
+(AddPairsWidenInt8x16 ...) => (VSADDLP16B ...) // pureVreg
+(VADD8H x d:(VSADDLP16B y)) && d.Uses == 1 => (VSADALP16B x y) // peepholeRule
+(AddPairsWidenInt16x8 ...) => (VSADDLP8H ...) // pureVreg
+(VADD4S x d:(VSADDLP8H y)) && d.Uses == 1 => (VSADALP8H x y) // peepholeRule
+(AddPairsWidenInt32x4 ...) => (VSADDLP4S ...) // pureVreg
+(VADD2D x d:(VSADDLP4S y)) && d.Uses == 1 => (VSADALP4S x y) // peepholeRule
+(AddPairsWidenUint8x16 ...) => (VUADDLP16B ...) // pureVreg
+(VADD8H x d:(VUADDLP16B y)) && d.Uses == 1 => (VUADALP16B x y) // peepholeRule
+(AddPairsWidenUint16x8 ...) => (VUADDLP8H ...) // pureVreg
+(VADD4S x d:(VUADDLP8H y)) && d.Uses == 1 => (VUADALP8H x y) // peepholeRule
+(AddPairsWidenUint32x4 ...) => (VUADDLP4S ...) // pureVreg
+(VADD2D x d:(VUADDLP4S y)) && d.Uses == 1 => (VUADALP4S x y) // peepholeRule
 (AddSaturatedInt8x16 ...) => (VSQADD16B ...) // pureVreg
 (AddSaturatedInt16x8 ...) => (VSQADD8H ...) // pureVreg
 (AddSaturatedInt32x4 ...) => (VSQADD4S ...) // pureVreg

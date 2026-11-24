@@ -403,7 +403,9 @@ func writeSIMDMachineOps(buffer *bytes.Buffer, ops []Operation) {
 			asm2Name := hiHalfOpName(*gOp.HiHalfAsm, gOp)
 			argLen2 := len(gOp.In)
 			regInfo2 := regInfo
-			resultInArg02 := false
+			// A long op that accumulates into its destination, such as
+			// UABAL, does so in its "2" variant too.
+			resultInArg02 := resultInArg0
 			if kind == "narrow" {
 				argLen2++ // extra vreg input for destination
 				regInfo2 = hiHalfRegShape2(regInfo, kind)

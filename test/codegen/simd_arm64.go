@@ -913,3 +913,51 @@ func addDotProductQuadrupleMixed(x archsimd.Int32x4, y archsimd.Uint8x16, z arch
 	// arm64:`VUSDOT V\d+\.B16, V\d+\.B16, V\d+\.S4` -`VADD`
 	return x.AddDotProductQuadrupleMixed(y, z)
 }
+
+// Absolute differences fuse with an accumulating Add.
+func absDiffAccumulate(acc archsimd.Uint8x16, x, y archsimd.Uint8x16) archsimd.Uint8x16 {
+	// arm64:`VUABA V\d+\.B16, V\d+\.B16, V\d+\.B16` -`VUABD` -`VADD`
+	return acc.Add(x.AbsDiff(y))
+}
+
+func absDiffAccumulateSigned(acc archsimd.Uint16x8, x, y archsimd.Int16x8) archsimd.Uint16x8 {
+	// arm64:`VSABA V\d+\.H8, V\d+\.H8, V\d+\.H8` -`VSABD` -`VADD`
+	return acc.Add(x.AbsDiff(y))
+}
+
+func absDiffWidenAccumulate(acc archsimd.Uint16x8, x, y archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUABAL V\d+\.B8, V\d+\.B8, V\d+\.H8` -`VUABDL` -`VADD`
+	return acc.Add(x.AbsDiffWiden(y))
+}
+
+func absDiffWidenAccumulateHi(acc archsimd.Uint16x8, x, y archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUABAL2 V\d+\.B16, V\d+\.B16, V\d+\.H8` -`VUABDL` -`VADD` -`VDUP`
+	return acc.Add(x.HiToLo().AbsDiffWiden(y.HiToLo()))
+}
+
+func absDiffWidenAccumulateSigned(acc archsimd.Uint32x4, x, y archsimd.Int16x8) archsimd.Uint32x4 {
+	// arm64:`VSABAL V\d+\.H4, V\d+\.H4, V\d+\.S4` -`VSABDL` -`VADD`
+	return acc.Add(x.AbsDiffWiden(y))
+}
+
+// The absolute difference is used twice, so it is not fused.
+func absDiffWidenTwice(acc archsimd.Uint16x8, x, y archsimd.Uint8x16) (archsimd.Uint16x8, archsimd.Uint16x8) {
+	// arm64:`VUABDL V\d+\.B8, V\d+\.B8, V\d+\.H8` -`VUABAL`
+	d := x.AbsDiffWiden(y)
+	return acc.Add(d), d
+}
+
+func addPairsWidenAccumulate(acc archsimd.Uint16x8, x archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUADALP V\d+\.B16, V\d+\.H8` -`VUADDLP` -`VADD`
+	return acc.Add(x.AddPairsWiden())
+}
+
+func addPairsWidenAccumulateSigned(acc archsimd.Int32x4, x archsimd.Int16x8) archsimd.Int32x4 {
+	// arm64:`VSADALP V\d+\.H8, V\d+\.S4` -`VSADDLP` -`VADD`
+	return acc.Add(x.AddPairsWiden())
+}
+
+func addPairsWiden(x archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUADDLP V\d+\.B16, V\d+\.H8`
+	return x.AddPairsWiden()
+}

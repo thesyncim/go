@@ -128,7 +128,9 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VDUPSextr:
 		p = simdV11ScalarImmIn1(s, v, arm64.ARNG_S)
 
-	case ssaop.OpARM64VADD16B,
+	case ssaop.OpARM64VSABD16B,
+		ssaop.OpARM64VUABD16B,
+		ssaop.OpARM64VADD16B,
 		ssaop.OpARM64VSQADD16B,
 		ssaop.OpARM64VUQADD16B,
 		ssaop.OpARM64VAND16B,
@@ -206,7 +208,9 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VCMTST2D:
 		p = simdV21(s, v, arm64.ARNG_2D)
 
-	case ssaop.OpARM64VFADD4S,
+	case ssaop.OpARM64VSABD4S,
+		ssaop.OpARM64VUABD4S,
+		ssaop.OpARM64VFADD4S,
 		ssaop.OpARM64VADD4S,
 		ssaop.OpARM64VSQADD4S,
 		ssaop.OpARM64VUQADD4S,
@@ -254,7 +258,9 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VCMTST4S:
 		p = simdV21(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VADD8H,
+	case ssaop.OpARM64VSABD8H,
+		ssaop.OpARM64VUABD8H,
+		ssaop.OpARM64VADD8H,
 		ssaop.OpARM64VSQADD8H,
 		ssaop.OpARM64VUQADD8H,
 		ssaop.OpARM64VSRHADD8H,
@@ -294,6 +300,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		p = simdV21Imm(s, v, arm64.ARNG_16B)
 
 	case ssaop.OpARM64VMLA16B,
+		ssaop.OpARM64VSABA16B,
+		ssaop.OpARM64VUABA16B,
 		ssaop.OpARM64VBIF16B,
 		ssaop.OpARM64VBIT16B:
 		p = simdV31ResultInArg0(s, v, arm64.ARNG_16B)
@@ -302,10 +310,14 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		p = simdV31ResultInArg0(s, v, arm64.ARNG_2D)
 
 	case ssaop.OpARM64VFMLA4S,
-		ssaop.OpARM64VMLA4S:
+		ssaop.OpARM64VMLA4S,
+		ssaop.OpARM64VSABA4S,
+		ssaop.OpARM64VUABA4S:
 		p = simdV31ResultInArg0(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VMLA8H:
+	case ssaop.OpARM64VMLA8H,
+		ssaop.OpARM64VSABA8H,
+		ssaop.OpARM64VUABA8H:
 		p = simdV31ResultInArg0(s, v, arm64.ARNG_8H)
 
 	case ssaop.OpARM64VSMOVBextr,
@@ -394,7 +406,9 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VUSHLL8H:
 		p = simdV11ImmLong(s, v, arm64.ARNG_8H)
 
-	case ssaop.OpARM64VSMULL16B,
+	case ssaop.OpARM64VSABDL16B,
+		ssaop.OpARM64VUABDL16B,
+		ssaop.OpARM64VSMULL16B,
 		ssaop.OpARM64VUMULL16B,
 		ssaop.OpARM64VPMULL16B:
 		p = simdV21Long(s, v, arm64.ARNG_16B)
@@ -402,11 +416,15 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VPMULL2D:
 		p = simdV21Long(s, v, arm64.ARNG_2D)
 
-	case ssaop.OpARM64VSMULL4S,
+	case ssaop.OpARM64VSABDL4S,
+		ssaop.OpARM64VUABDL4S,
+		ssaop.OpARM64VSMULL4S,
 		ssaop.OpARM64VUMULL4S:
 		p = simdV21Long(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VSMULL8H,
+	case ssaop.OpARM64VSABDL8H,
+		ssaop.OpARM64VUABDL8H,
+		ssaop.OpARM64VSMULL8H,
 		ssaop.OpARM64VUMULL8H:
 		p = simdV21Long(s, v, arm64.ARNG_8H)
 
@@ -463,7 +481,9 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VUSHLL2_8H:
 		p = simdV11ImmLong2(s, v, arm64.ARNG_8H)
 
-	case ssaop.OpARM64VSMULL2_16B,
+	case ssaop.OpARM64VSABDL2_16B,
+		ssaop.OpARM64VUABDL2_16B,
+		ssaop.OpARM64VSMULL2_16B,
 		ssaop.OpARM64VUMULL2_16B,
 		ssaop.OpARM64VPMULL2_16B:
 		p = simdV21Long2(s, v, arm64.ARNG_16B)
@@ -471,11 +491,15 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VPMULL2_2D:
 		p = simdV21Long2(s, v, arm64.ARNG_2D)
 
-	case ssaop.OpARM64VSMULL2_4S,
+	case ssaop.OpARM64VSABDL2_4S,
+		ssaop.OpARM64VUABDL2_4S,
+		ssaop.OpARM64VSMULL2_4S,
 		ssaop.OpARM64VUMULL2_4S:
 		p = simdV21Long2(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VSMULL2_8H,
+	case ssaop.OpARM64VSABDL2_8H,
+		ssaop.OpARM64VUABDL2_8H,
+		ssaop.OpARM64VSMULL2_8H,
 		ssaop.OpARM64VUMULL2_8H:
 		p = simdV21Long2(s, v, arm64.ARNG_8H)
 
@@ -489,6 +513,54 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VUDOT16B,
 		ssaop.OpARM64VUSDOT16B:
 		p = simdV31ResultInArg0Dot(s, v, arm64.ARNG_16B)
+
+	case ssaop.OpARM64VSABAL16B,
+		ssaop.OpARM64VUABAL16B:
+		p = simdV31ResultInArg0Long(s, v, arm64.ARNG_16B)
+
+	case ssaop.OpARM64VSABAL4S,
+		ssaop.OpARM64VUABAL4S:
+		p = simdV31ResultInArg0Long(s, v, arm64.ARNG_4S)
+
+	case ssaop.OpARM64VSABAL8H,
+		ssaop.OpARM64VUABAL8H:
+		p = simdV31ResultInArg0Long(s, v, arm64.ARNG_8H)
+
+	case ssaop.OpARM64VSABAL2_16B,
+		ssaop.OpARM64VUABAL2_16B:
+		p = simdV31ResultInArg0Long2(s, v, arm64.ARNG_16B)
+
+	case ssaop.OpARM64VSABAL2_4S,
+		ssaop.OpARM64VUABAL2_4S:
+		p = simdV31ResultInArg0Long2(s, v, arm64.ARNG_4S)
+
+	case ssaop.OpARM64VSABAL2_8H,
+		ssaop.OpARM64VUABAL2_8H:
+		p = simdV31ResultInArg0Long2(s, v, arm64.ARNG_8H)
+
+	case ssaop.OpARM64VSADDLP16B,
+		ssaop.OpARM64VUADDLP16B:
+		p = simdV11LongPairwise(s, v, arm64.ARNG_16B)
+
+	case ssaop.OpARM64VSADDLP4S,
+		ssaop.OpARM64VUADDLP4S:
+		p = simdV11LongPairwise(s, v, arm64.ARNG_4S)
+
+	case ssaop.OpARM64VSADDLP8H,
+		ssaop.OpARM64VUADDLP8H:
+		p = simdV11LongPairwise(s, v, arm64.ARNG_8H)
+
+	case ssaop.OpARM64VSADALP16B,
+		ssaop.OpARM64VUADALP16B:
+		p = simdV21ResultInArg0LongPairwise(s, v, arm64.ARNG_16B)
+
+	case ssaop.OpARM64VSADALP4S,
+		ssaop.OpARM64VUADALP4S:
+		p = simdV21ResultInArg0LongPairwise(s, v, arm64.ARNG_4S)
+
+	case ssaop.OpARM64VSADALP8H,
+		ssaop.OpARM64VUADALP8H:
+		p = simdV21ResultInArg0LongPairwise(s, v, arm64.ARNG_8H)
 
 	default:
 		// Unknown reg shape

@@ -4,6 +4,124 @@
 
 package archsimd
 
+/* AbsDiff */
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VSABD
+func (x Int8x16) AbsDiff(y Int8x16) (z Uint8x16)
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VSABD
+func (x Int16x8) AbsDiff(y Int16x8) (z Uint16x8)
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VSABD
+func (x Int32x4) AbsDiff(y Int32x4) (z Uint32x4)
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VUABD
+func (x Uint8x16) AbsDiff(y Uint8x16) (z Uint8x16)
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VUABD
+func (x Uint16x8) AbsDiff(y Uint16x8) (z Uint16x8)
+
+// AbsDiff returns the elementwise absolute difference of x and y.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// The difference is computed exactly, so the result is unsigned and never
+// overflows.
+//
+// Asm: VUABD
+func (x Uint32x4) AbsDiff(y Uint32x4) (z Uint32x4)
+
+/* AbsDiffWiden */
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VSABDL
+func (x Int8x16) AbsDiffWiden(y Int8x16) (z Uint16x8)
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VSABDL
+func (x Int16x8) AbsDiffWiden(y Int16x8) (z Uint32x4)
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VSABDL
+func (x Int32x4) AbsDiffWiden(y Int32x4) (z Uint64x2)
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VUABDL
+func (x Uint8x16) AbsDiffWiden(y Uint8x16) (z Uint16x8)
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VUABDL
+func (x Uint16x8) AbsDiffWiden(y Uint16x8) (z Uint32x4)
+
+// AbsDiffWiden returns the absolute difference of corresponding elements in
+// the lower half of x and y, as a vector of half as many unsigned elements,
+// each with twice the input element size.
+//
+//	z[i] = |x[i] - y[i]|
+//
+// Asm: VUABDL
+func (x Uint32x4) AbsDiffWiden(y Uint32x4) (z Uint64x2)
+
 /* AddDotProductQuadruple */
 
 // AddDotProductQuadruple multiplies corresponding elements of y and z, sums
@@ -43,6 +161,68 @@ func (x Uint32x4) AddDotProductQuadruple(y Uint8x16, z Uint8x16) (w Uint32x4)
 //
 // Asm: VUSDOT, CPU Feature: I8MM
 func (x Int32x4) AddDotProductQuadrupleMixed(y Uint8x16, z Int8x16) (w Int32x4)
+
+/* AddPairsWiden */
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VSADDLP
+func (x Int8x16) AddPairsWiden() (z Int16x8)
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VSADDLP
+func (x Int16x8) AddPairsWiden() (z Int32x4)
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VSADDLP
+func (x Int32x4) AddPairsWiden() (z Int64x2)
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VUADDLP
+func (x Uint8x16) AddPairsWiden() (z Uint16x8)
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VUADDLP
+func (x Uint16x8) AddPairsWiden() (z Uint32x4)
+
+// AddPairsWiden sums adjacent pairs of elements of x, returning a vector of
+// half as many elements, each with twice the input element size.
+//
+//	z[i] = x[2*i] + x[2*i+1]
+//
+// The doubled element width is sufficient to hold every sum without overflow.
+//
+// Asm: VUADDLP
+func (x Uint32x4) AddPairsWiden() (z Uint64x2)
 
 /* LeadingSignBits */
 

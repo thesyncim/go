@@ -15,6 +15,18 @@
   commutative: false
   documentation: !string |-
     // NAME subtracts corresponding elements of two vectors with saturation.
+- go: AddPairsWiden
+  commutative: false
+  documentation: !string |-
+    // NAME sums adjacent pairs of elements, widening the result.
+# The accumulating form of AddPairsWiden, as a machine op only, for a
+# peephole rule that fuses x.Add(y.AddPairsWiden()).
+- go: addPairsWidenAccumulate
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+  documentation: !string |-
+    // NAME adds the sums of adjacent pairs of elements of y, widened, to x.
 - go: ConcatAddPairs
   commutative: false
   out:

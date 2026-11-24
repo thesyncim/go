@@ -89,3 +89,54 @@
   - *fp
   out:
   - *fp
+
+# Add pairwise long — VUADDLP, VSADDLP
+# x.Add(y.AddPairsWiden()) fuses into VUADALP or VSADALP.
+- go: AddPairsWiden
+  asm: "VUADDLP"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y)) && d.Uses == 1 => (VUADALP%a x y)"
+  in:
+  - go: $t
+    base: uint
+    bits: 128
+  out:
+  - go: $u
+    base: uint
+
+- go: AddPairsWiden
+  asm: "VSADDLP"
+  peepholeRules:
+  - !string "(VADD%w x d:(%h y)) && d.Uses == 1 => (VSADALP%a x y)"
+  in:
+  - go: $t
+    base: int
+    bits: 128
+  out:
+  - go: $u
+    base: int
+
+# Add and accumulate pairwise long — VUADALP, VSADALP
+- go: addPairsWidenAccumulate
+  asm: "VUADALP"
+  in:
+  - &uadalpAcc
+    go: $u
+    base: uint
+  - go: $t
+    base: uint
+    bits: 128
+  out:
+  - *uadalpAcc
+
+- go: addPairsWidenAccumulate
+  asm: "VSADALP"
+  in:
+  - &sadalpAcc
+    go: $u
+    base: int
+  - go: $t
+    base: int
+    bits: 128
+  out:
+  - *sadalpAcc
