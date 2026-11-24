@@ -54,6 +54,36 @@ func ShiftAllRight[E Ints | Uints, W Width](x Vec[E, W], shift uint64) (z Vec[E,
 	})
 }
 
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// {{if eq .xB "int" -}}
+// The shift is arithmetic. If shift is greater than or equal to the element
+// width, the result is 0.
+// {{- else -}}
+// The shift is logical. If shift is greater than the element width, the
+// result is 0.
+// {{- end}}
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+//specgen:experiment
+func ShiftAllRightRounded[E Ints | Uints, W Width](x Vec[E, W], shift uint64) (z Vec[E, W]) {
+	return map1[E, W, E, W](x, func(v E) E {
+		if shift == 0 {
+			return v
+		}
+		if shift > uint64(elemBits[E]()) {
+			return 0
+		}
+		// v >> (shift-1) can't overflow; its lowest bit is the bit
+		// that rounding adds 1 to.
+		h := v >> (shift - 1)
+		return h>>1 + h&1
+	})
+}
+
 // ShiftAllLeft shifts each element of x left by shift bits.
 // As in Go, if shift is greater than or equal to the element width, the
 // result is 0.

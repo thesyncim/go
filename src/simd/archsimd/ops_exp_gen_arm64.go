@@ -332,6 +332,64 @@ func (x Uint32x4) Scale(y Int32x4) Uint32x4
 // Asm: VUSHL
 func (x Uint64x2) Scale(y Int64x2) Uint64x2
 
+/* ScaleRounded */
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VSRSHL
+func (x Int8x16) ScaleRounded(y Int8x16) Int8x16
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VSRSHL
+func (x Int16x8) ScaleRounded(y Int16x8) Int16x8
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VSRSHL
+func (x Int32x4) ScaleRounded(y Int32x4) Int32x4
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VSRSHL
+func (x Int64x2) ScaleRounded(y Int64x2) Int64x2
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VURSHL
+func (x Uint8x16) ScaleRounded(y Int8x16) Uint8x16
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VURSHL
+func (x Uint16x8) ScaleRounded(y Int16x8) Uint16x8
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VURSHL
+func (x Uint32x4) ScaleRounded(y Int32x4) Uint32x4
+
+// ScaleRounded shifts each element in x by the signed value of the least significant byte
+// of y's corresponding element: positive values shift left, negative values shift
+// right, rounding to nearest with ties rounded up.
+//
+// Asm: VURSHL
+func (x Uint64x2) ScaleRounded(y Int64x2) Uint64x2
+
 /* ScaleSaturated */
 
 // ScaleSaturated multiplies each element of x by a power of two given by scale,
@@ -439,3 +497,101 @@ func (x Uint32x4) ScaleSaturated(scale Int8x16) (z Uint32x4)
 //
 // Asm: VUQSHL
 func (x Uint64x2) ScaleSaturated(scale Int8x16) (z Uint64x2)
+
+/* ShiftAllRightRounded */
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is arithmetic. If shift is greater than or equal to the element
+// width, the result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VSRSHL
+func (x Int8x16) ShiftAllRightRounded(shift uint64) (z Int8x16)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is arithmetic. If shift is greater than or equal to the element
+// width, the result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VSRSHL
+func (x Int16x8) ShiftAllRightRounded(shift uint64) (z Int16x8)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is arithmetic. If shift is greater than or equal to the element
+// width, the result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VSRSHL
+func (x Int32x4) ShiftAllRightRounded(shift uint64) (z Int32x4)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is arithmetic. If shift is greater than or equal to the element
+// width, the result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VSRSHL
+func (x Int64x2) ShiftAllRightRounded(shift uint64) (z Int64x2)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is logical. If shift is greater than the element width, the
+// result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VURSHL
+func (x Uint8x16) ShiftAllRightRounded(shift uint64) (z Uint8x16)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is logical. If shift is greater than the element width, the
+// result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VURSHL
+func (x Uint16x8) ShiftAllRightRounded(shift uint64) (z Uint16x8)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is logical. If shift is greater than the element width, the
+// result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VURSHL
+func (x Uint32x4) ShiftAllRightRounded(shift uint64) (z Uint32x4)
+
+// ShiftAllRightRounded shifts each element of x right by shift bits, rounding
+// the result to nearest, with ties rounded up. The sum is computed exactly,
+// so it never overflows.
+// The shift is logical. If shift is greater than the element width, the
+// result is 0.
+//
+//	z[i] = (x[i] + 1<<(shift-1)) >> shift   // for shift > 0
+//	z[i] = x[i]                             // for shift == 0
+//
+// Asm: VURSHL
+func (x Uint64x2) ShiftAllRightRounded(shift uint64) (z Uint64x2)

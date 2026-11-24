@@ -977,3 +977,51 @@ func mulFixedPointRounded(x, y archsimd.Int16x8) archsimd.Int16x8 {
 	// arm64:`VSQRDMULH V\d+\.H8, V\d+\.H8, V\d+\.H8`
 	return x.MulFixedPointRounded(y)
 }
+
+// Rounding shifts by a constant use the immediate form.
+func shiftAllRightRoundedConst(x archsimd.Uint16x8) archsimd.Uint16x8 {
+	// arm64:`VURSHR [$]4, V\d+\.H8, V\d+\.H8` -`VURSHL`
+	return x.ShiftAllRightRounded(4)
+}
+
+func shiftAllRightRoundedVar(x archsimd.Int32x4, s uint64) archsimd.Int32x4 {
+	// arm64:`VSRSHL V\d+\.S4, V\d+\.S4, V\d+\.S4` -`VSRSHR`
+	return x.ShiftAllRightRounded(s)
+}
+
+// Narrowing conversions of constant right shifts fuse into the narrowing
+// shift instructions.
+func shiftAllRightRoundedTrunc(x archsimd.Uint16x8) archsimd.Uint8x16 {
+	// arm64:`VRSHRN [$]6, V\d+\.H8, V\d+\.B8` -`VXTN` -`VURSHR`
+	return x.ShiftAllRightRounded(6).TruncToUint8()
+}
+
+func shiftAllRightSaturate(x archsimd.Int32x4) archsimd.Int16x8 {
+	// arm64:`VSQSHRN [$]7, V\d+\.S4, V\d+\.H4` -`VSQXTN` -`VSSHR`
+	return x.ShiftAllRight(7).SaturateToInt16()
+}
+
+func shiftAllRightRoundedSaturate(x archsimd.Int32x4) archsimd.Int16x8 {
+	// arm64:`VSQRSHRN [$]12, V\d+\.S4, V\d+\.H4` -`VSQXTN` -`VSRSHR`
+	return x.ShiftAllRightRounded(12).SaturateToInt16()
+}
+
+func shiftAllRightSaturateUnsigned(x archsimd.Int16x8) archsimd.Uint8x16 {
+	// arm64:`VSQSHRUN [$]2, V\d+\.H8, V\d+\.B8` -`VSQXTUN` -`VSSHR`
+	return x.ShiftAllRight(2).SaturateToUint8()
+}
+
+func shiftAllRightRoundedSaturateUnsigned(x archsimd.Int16x8) archsimd.Uint8x16 {
+	// arm64:`VSQRSHRUN [$]4, V\d+\.H8, V\d+\.B8` -`VSQXTUN` -`VSRSHR`
+	return x.ShiftAllRightRounded(4).SaturateToUint8()
+}
+
+func shiftAllRightSaturateUint(x archsimd.Uint16x8) archsimd.Uint8x16 {
+	// arm64:`VUQSHRN [$]3, V\d+\.H8, V\d+\.B8` -`VUQXTN` -`VUSHR`
+	return x.ShiftAllRight(3).SaturateToUint8()
+}
+
+func shiftAllRightRoundedSaturateUint(x archsimd.Uint32x4) archsimd.Uint16x8 {
+	// arm64:`VUQRSHRN [$]5, V\d+\.S4, V\d+\.H4` -`VUQXTN` -`VURSHR`
+	return x.ShiftAllRightRounded(5).SaturateToUint16()
+}

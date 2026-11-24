@@ -62,6 +62,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VSHL16B,
 		ssaop.OpARM64VSSHR16B,
 		ssaop.OpARM64VUSHR16B,
+		ssaop.OpARM64VSRSHR16B,
+		ssaop.OpARM64VURSHR16B,
 		ssaop.OpARM64VSQSHL16Bconst,
 		ssaop.OpARM64VUQSHL16Bconst:
 		p = simdV11Imm(s, v, arm64.ARNG_16B)
@@ -69,6 +71,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VSHL2D,
 		ssaop.OpARM64VSSHR2D,
 		ssaop.OpARM64VUSHR2D,
+		ssaop.OpARM64VSRSHR2D,
+		ssaop.OpARM64VURSHR2D,
 		ssaop.OpARM64VSQSHL2Dconst,
 		ssaop.OpARM64VUQSHL2Dconst:
 		p = simdV11Imm(s, v, arm64.ARNG_2D)
@@ -76,6 +80,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VSHL4S,
 		ssaop.OpARM64VSSHR4S,
 		ssaop.OpARM64VUSHR4S,
+		ssaop.OpARM64VSRSHR4S,
+		ssaop.OpARM64VURSHR4S,
 		ssaop.OpARM64VSQSHL4Sconst,
 		ssaop.OpARM64VUQSHL4Sconst:
 		p = simdV11Imm(s, v, arm64.ARNG_4S)
@@ -83,6 +89,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VSHL8H,
 		ssaop.OpARM64VSSHR8H,
 		ssaop.OpARM64VUSHR8H,
+		ssaop.OpARM64VSRSHR8H,
+		ssaop.OpARM64VURSHR8H,
 		ssaop.OpARM64VSQSHL8Hconst,
 		ssaop.OpARM64VUQSHL8Hconst:
 		p = simdV11Imm(s, v, arm64.ARNG_8H)
@@ -161,6 +169,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VORR16B,
 		ssaop.OpARM64VSSHL16B,
 		ssaop.OpARM64VUSHL16B,
+		ssaop.OpARM64VSRSHL16B,
+		ssaop.OpARM64VURSHL16B,
 		ssaop.OpARM64VSQSHL16B,
 		ssaop.OpARM64VUQSHL16B,
 		ssaop.OpARM64VSUB16B,
@@ -199,6 +209,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VFMUL2D,
 		ssaop.OpARM64VSSHL2D,
 		ssaop.OpARM64VUSHL2D,
+		ssaop.OpARM64VSRSHL2D,
+		ssaop.OpARM64VURSHL2D,
 		ssaop.OpARM64VSQSHL2D,
 		ssaop.OpARM64VUQSHL2D,
 		ssaop.OpARM64VFSUB2D,
@@ -250,6 +262,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VSQRDMULH4S,
 		ssaop.OpARM64VSSHL4S,
 		ssaop.OpARM64VUSHL4S,
+		ssaop.OpARM64VSRSHL4S,
+		ssaop.OpARM64VURSHL4S,
 		ssaop.OpARM64VSQSHL4S,
 		ssaop.OpARM64VUQSHL4S,
 		ssaop.OpARM64VFSUB4S,
@@ -290,6 +304,8 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VSQRDMULH8H,
 		ssaop.OpARM64VSSHL8H,
 		ssaop.OpARM64VUSHL8H,
+		ssaop.OpARM64VSRSHL8H,
+		ssaop.OpARM64VURSHL8H,
 		ssaop.OpARM64VSQSHL8H,
 		ssaop.OpARM64VUQSHL8H,
 		ssaop.OpARM64VSUB8H,
@@ -387,13 +403,34 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VXTN8H:
 		p = simdV11Narrow(s, v, arm64.ARNG_8H)
 
-	case ssaop.OpARM64VSHRN2D:
+	case ssaop.OpARM64VSHRN2D,
+		ssaop.OpARM64VRSHRN2D,
+		ssaop.OpARM64VSQRSHRN2D,
+		ssaop.OpARM64VUQRSHRN2D,
+		ssaop.OpARM64VSQRSHRUN2D,
+		ssaop.OpARM64VSQSHRN2D,
+		ssaop.OpARM64VUQSHRN2D,
+		ssaop.OpARM64VSQSHRUN2D:
 		p = simdV11ImmNarrow(s, v, arm64.ARNG_2D)
 
-	case ssaop.OpARM64VSHRN4S:
+	case ssaop.OpARM64VSHRN4S,
+		ssaop.OpARM64VRSHRN4S,
+		ssaop.OpARM64VSQRSHRN4S,
+		ssaop.OpARM64VUQRSHRN4S,
+		ssaop.OpARM64VSQRSHRUN4S,
+		ssaop.OpARM64VSQSHRN4S,
+		ssaop.OpARM64VUQSHRN4S,
+		ssaop.OpARM64VSQSHRUN4S:
 		p = simdV11ImmNarrow(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VSHRN8H:
+	case ssaop.OpARM64VSHRN8H,
+		ssaop.OpARM64VRSHRN8H,
+		ssaop.OpARM64VSQRSHRN8H,
+		ssaop.OpARM64VUQRSHRN8H,
+		ssaop.OpARM64VSQRSHRUN8H,
+		ssaop.OpARM64VSQSHRN8H,
+		ssaop.OpARM64VUQSHRN8H,
+		ssaop.OpARM64VSQSHRUN8H:
 		p = simdV11ImmNarrow(s, v, arm64.ARNG_8H)
 
 	case ssaop.OpARM64VSSHLL16B,
@@ -462,13 +499,34 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 		ssaop.OpARM64VXTN2_8H:
 		p = simdV21Narrow2(s, v, arm64.ARNG_8H)
 
-	case ssaop.OpARM64VSHRN2_2D:
+	case ssaop.OpARM64VSHRN2_2D,
+		ssaop.OpARM64VRSHRN2_2D,
+		ssaop.OpARM64VSQRSHRN2_2D,
+		ssaop.OpARM64VUQRSHRN2_2D,
+		ssaop.OpARM64VSQRSHRUN2_2D,
+		ssaop.OpARM64VSQSHRN2_2D,
+		ssaop.OpARM64VUQSHRN2_2D,
+		ssaop.OpARM64VSQSHRUN2_2D:
 		p = simdV21ImmNarrow2(s, v, arm64.ARNG_2D)
 
-	case ssaop.OpARM64VSHRN2_4S:
+	case ssaop.OpARM64VSHRN2_4S,
+		ssaop.OpARM64VRSHRN2_4S,
+		ssaop.OpARM64VSQRSHRN2_4S,
+		ssaop.OpARM64VUQRSHRN2_4S,
+		ssaop.OpARM64VSQRSHRUN2_4S,
+		ssaop.OpARM64VSQSHRN2_4S,
+		ssaop.OpARM64VUQSHRN2_4S,
+		ssaop.OpARM64VSQSHRUN2_4S:
 		p = simdV21ImmNarrow2(s, v, arm64.ARNG_4S)
 
-	case ssaop.OpARM64VSHRN2_8H:
+	case ssaop.OpARM64VSHRN2_8H,
+		ssaop.OpARM64VRSHRN2_8H,
+		ssaop.OpARM64VSQRSHRN2_8H,
+		ssaop.OpARM64VUQRSHRN2_8H,
+		ssaop.OpARM64VSQRSHRUN2_8H,
+		ssaop.OpARM64VSQSHRN2_8H,
+		ssaop.OpARM64VUQSHRN2_8H,
+		ssaop.OpARM64VSQSHRUN2_8H:
 		p = simdV21ImmNarrow2(s, v, arm64.ARNG_8H)
 
 	case ssaop.OpARM64VSSHLL2_16B,

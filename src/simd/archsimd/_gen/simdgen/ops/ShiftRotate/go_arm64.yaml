@@ -27,6 +27,29 @@
   out:
   - *uint
 
+# Rounding scale (rounding shift by vector)
+- go: ScaleRounded
+  signed: true
+  asm: "VSRSHL"
+  in:
+  - *int
+  - go: $t
+    name: y
+  out:
+  - *int
+
+- go: ScaleRounded
+  signed: false
+  asm: "VURSHL"
+  in:
+  - *uint
+  - go: $t
+    base: uint
+    overwriteBase: int
+    name: y
+  out:
+  - *uint
+
 # The scale operand is always an Int8 vector. SQSHL/UQSHL use only the low
 # byte of each element of the scale register, so x[i] is scaled by the int8
 # element that lines up with x[i]'s lowest byte.
@@ -192,6 +215,140 @@
   - *scalarShiftUnsigned
   out:
   - *uint
+
+# Rounding shift right by constant
+- go: shiftAllRightRoundedConst
+  signed: true
+  asm: "VSRSHR"
+  asmRules:
+  - !string "a==0 => x"
+  in:
+  - *imm
+  - *int
+  out:
+  - *int
+
+- go: shiftAllRightRoundedConst
+  signed: false
+  asm: "VURSHR"
+  asmRules:
+  - !string "a==0 => x"
+  in:
+  - *imm
+  - *uint
+  out:
+  - *uint
+
+# Rounding shift right. With a constant amount it is lowered to the immediate
+# rounding shift (or to zero for a shift by more than the element width),
+# otherwise to a rounding shift left by the negated amount.
+- go: ShiftAllRightRounded
+  signed: true
+  asm: "VSRSHL"
+  lowerRules:
+  - !string "(%g x (MOVDconst [c])) && uint64(c) <= %b => (VSRSHR%a [uint8(c)] x)"
+  - !string "(%g x (MOVDconst [c])) => (VMOVI16B [0])"
+  - !string "(%g x y) => (VSRSHL%a x (VDUP%sbcast [0] (VMOV%sins [0] x (NEG <typ.Int64> (CSEL <typ.UInt64> [ssaop.OpARM64LessThanU] y (MOVDconst [127]) (CMPconst [127] y))))))"
+  in:
+  - *int
+  - *scalarShiftSigned
+  out:
+  - *int
+
+- go: ShiftAllRightRounded
+  signed: false
+  asm: "VURSHL"
+  lowerRules:
+  - !string "(%g x (MOVDconst [c])) && uint64(c) <= %b => (VURSHR%a [uint8(c)] x)"
+  - !string "(%g x (MOVDconst [c])) => (VMOVI16B [0])"
+  - !string "(%g x y) => (VURSHL%a x (VDUP%sbcast [0] (VMOV%sins [0] x (NEG <typ.Int64> (CSEL <typ.UInt64> [ssaop.OpARM64LessThanU] y (MOVDconst [127]) (CMPconst [127] y))))))"
+  in:
+  - *uint
+  - *scalarShiftUnsigned
+  out:
+  - *uint
+
+# Rounding shift right narrow — VRSHRN
+- go: shiftRightNarrowRoundedConst
+  asm: "VRSHRN"
+  hiHalfAsm: "VRSHRN2"
+  in:
+  - *imm
+  - go: $t
+    base: uint
+  out:
+  - go: $u
+    base: uint
+
+# Saturating (rounding) shift right narrow — VSQSHRN, VSQRSHRN, VUQSHRN, VUQRSHRN
+- go: shiftRightNarrowSaturatedConst
+  asm: "VSQSHRN"
+  hiHalfAsm: "VSQSHRN2"
+  in:
+  - *imm
+  - go: $t
+    base: int
+  out:
+  - go: $u
+    base: int
+
+- go: shiftRightNarrowSaturatedConst
+  asm: "VUQSHRN"
+  hiHalfAsm: "VUQSHRN2"
+  in:
+  - *imm
+  - go: $t
+    base: uint
+  out:
+  - go: $u
+    base: uint
+
+- go: shiftRightNarrowRoundedSaturatedConst
+  asm: "VSQRSHRN"
+  hiHalfAsm: "VSQRSHRN2"
+  in:
+  - *imm
+  - go: $t
+    base: int
+  out:
+  - go: $u
+    base: int
+
+- go: shiftRightNarrowRoundedSaturatedConst
+  asm: "VUQRSHRN"
+  hiHalfAsm: "VUQRSHRN2"
+  in:
+  - *imm
+  - go: $t
+    base: uint
+  out:
+  - go: $u
+    base: uint
+
+# Signed saturating (rounding) shift right unsigned narrow — VSQSHRUN, VSQRSHRUN
+- go: shiftRightNarrowSaturatedUnsignedConst
+  asm: "VSQSHRUN"
+  hiHalfAsm: "VSQSHRUN2"
+  in:
+  - *imm
+  - go: $t
+    base: int
+  out:
+  - go: $u
+    base: int
+    overwriteBase: uint
+
+- go: shiftRightNarrowRoundedSaturatedUnsignedConst
+  asm: "VSQRSHRUN"
+  hiHalfAsm: "VSQRSHRUN2"
+  in:
+  - *imm
+  - go: $t
+    base: int
+  out:
+  - go: $u
+    base: int
+    overwriteBase: uint
 
 - go: shiftRightNarrowConst
   asm: "VSHRN"

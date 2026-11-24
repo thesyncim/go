@@ -6,6 +6,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 16
@@ -19,6 +21,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 16
@@ -32,6 +36,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 32
@@ -45,6 +51,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 32
@@ -58,6 +66,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 64
@@ -71,6 +81,8 @@
   peepholeRules:
   - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
   - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 64
@@ -279,6 +291,9 @@
 - go: SaturateToInt8
   asm: "VSQXTN"
   hiHalfAsm: "VSQXTN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 16
@@ -290,6 +305,9 @@
 - go: SaturateToInt16
   asm: "VSQXTN"
   hiHalfAsm: "VSQXTN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 32
@@ -301,6 +319,9 @@
 - go: SaturateToInt32
   asm: "VSQXTN"
   hiHalfAsm: "VSQXTN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRN%a [c] x)"
   in:
     - base: int
       elemBits: 64
@@ -314,6 +335,9 @@
 - go: SaturateToUint8
   asm: "VSQXTUN"
   hiHalfAsm: "VSQXTUN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRUN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRUN%a [c] x)"
   in:
     - base: int
       elemBits: 16
@@ -326,6 +350,9 @@
 - go: SaturateToUint16
   asm: "VSQXTUN"
   hiHalfAsm: "VSQXTUN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRUN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRUN%a [c] x)"
   in:
     - base: int
       elemBits: 32
@@ -338,6 +365,9 @@
 - go: SaturateToUint32
   asm: "VSQXTUN"
   hiHalfAsm: "VSQXTUN2"
+  peepholeRules:
+  - !string "(%h (VSSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQSHRUN%a [c] x)"
+  - !string "(%h (VSRSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VSQRSHRUN%a [c] x)"
   in:
     - base: int
       elemBits: 64
@@ -351,6 +381,9 @@
 - go: SaturateToUint8
   asm: "VUQXTN"
   hiHalfAsm: "VUQXTN2"
+  peepholeRules:
+  - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 16
@@ -362,6 +395,9 @@
 - go: SaturateToUint16
   asm: "VUQXTN"
   hiHalfAsm: "VUQXTN2"
+  peepholeRules:
+  - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 32
@@ -373,6 +409,9 @@
 - go: SaturateToUint32
   asm: "VUQXTN"
   hiHalfAsm: "VUQXTN2"
+  peepholeRules:
+  - !string "(%h (VUSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQSHRN%a [c] x)"
+  - !string "(%h (VURSHR%a [c] x)) && uint64(c) >= 1 && uint64(c)*2 <= %b => (VUQRSHRN%a [c] x)"
   in:
     - base: uint
       elemBits: 64

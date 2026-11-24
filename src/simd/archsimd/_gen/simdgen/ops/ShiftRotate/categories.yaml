@@ -9,6 +9,14 @@
   documentation: !string |-
     // NAME shifts each element in x by the signed value of the least significant byte
     // of y's corresponding element: positive values shift left, negative values shift right.
+- go: ScaleRounded
+  commutative: false
+  out:
+  - base: "int|uint"
+  documentation: !string |-
+    // NAME shifts each element in x by the signed value of the least significant byte
+    // of y's corresponding element: positive values shift left, negative values shift
+    // right, rounding to nearest with ties rounded up.
 - go: ScaleSaturated
   signed: true
   commutative: false
@@ -99,6 +107,37 @@
   noTypes: "true"
   noGenericOps: "true"
   signed: true
+  commutative: false
+- go: ShiftAllRightRounded
+  commutative: false
+  documentation: !string |-
+    // NAME shifts each element of x right by shift bits, rounding to nearest.
+- go: shiftAllRightRoundedConst # no APIs, only ssa ops.
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+# Saturating and rounding narrowing shifts, as machine ops only, for peephole
+# rules that fuse TruncTo* and SaturateTo* of a ShiftAllRight or
+# ShiftAllRightRounded by a constant.
+- go: shiftRightNarrowRoundedConst
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+- go: shiftRightNarrowSaturatedConst
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+- go: shiftRightNarrowRoundedSaturatedConst
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+- go: shiftRightNarrowSaturatedUnsignedConst
+  noTypes: "true"
+  noGenericOps: "true"
+  commutative: false
+- go: shiftRightNarrowRoundedSaturatedUnsignedConst
+  noTypes: "true"
+  noGenericOps: "true"
   commutative: false
 
 - go: ShiftLeft
