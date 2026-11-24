@@ -1363,6 +1363,71 @@ func (t *SemTable) Dequeue(addr *uint32) bool {
 	return false
 }
 
+// WaitingGCacheRefill empties the current P's waitingG cache and the
+// central waitingG cache, acquires and releases one waitingG, and
+// restores both caches. It returns the length of the P's cache right
+// after the acquire, and the cache's capacity.
+func WaitingGCacheRefill() (n, capacity int) {
+	mp := acquirem()
+	pp := mp.p.ptr()
+	var local [len((*p)(nil).waitingGBuf)]*waitingG
+	nlocal := copy(local[:], pp.waitingGCache)
+	clear(pp.waitingGCache)
+	pp.waitingGCache = pp.waitingGCache[:0]
+	lock(&sched.waitingGLock)
+	central := sched.waitingGCache
+	sched.waitingGCache = nil
+	unlock(&sched.waitingGLock)
+
+	wg := acquireWaitingG(waitingGTypeSema)
+	n, capacity = len(pp.waitingGCache), cap(pp.waitingGCache)
+	releaseWaitingG(wg)
+
+	// Hand what the test allocated to the central cache,
+	// and put everything back.
+	lock(&sched.waitingGLock)
+	for _, wg := range pp.waitingGCache {
+		wg.next = central
+		central = wg
+	}
+	if sched.waitingGCache == nil {
+		sched.waitingGCache = central
+	} else {
+		tail := sched.waitingGCache
+		for tail.next != nil {
+			tail = tail.next
+		}
+		tail.next = central
+	}
+	unlock(&sched.waitingGLock)
+	clear(pp.waitingGCache)
+	pp.waitingGCache = append(pp.waitingGCache[:0], local[:nlocal]...)
+	releasem(mp)
+	return n, capacity
+}
+
+// AddWaitingGCentral adds n new waitingGs to the central waitingG cache.
+func AddWaitingGCentral(n int) {
+	for range n {
+		wg := new(waitingG)
+		lock(&sched.waitingGLock)
+		wg.next = sched.waitingGCache
+		sched.waitingGCache = wg
+		unlock(&sched.waitingGLock)
+	}
+}
+
+// WaitingGCentralLen returns the length of the central waitingG cache.
+func WaitingGCentralLen() int {
+	n := 0
+	lock(&sched.waitingGLock)
+	for wg := sched.waitingGCache; wg != nil; wg = wg.next {
+		n++
+	}
+	unlock(&sched.waitingGLock)
+	return n
+}
+
 // mspan wrapper for testing.
 type MSpan mspan
 
