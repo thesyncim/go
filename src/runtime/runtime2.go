@@ -912,11 +912,8 @@ type p struct {
 	// Available G's (status == Gdead)
 	gFree gList
 
-	// Cache of waitingG structs. Kept small so that waitingGs
-	// released on a P that mostly runs woken goroutines flow back
-	// through sched.waitingGCache to Ps that mostly block them.
 	waitingGCache []*waitingG
-	waitingGBuf   [64]*waitingG
+	waitingGBuf   [128]*waitingG
 
 	// Cache of mspan objects from the heap.
 	mspancache struct {
