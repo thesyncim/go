@@ -31,3 +31,48 @@
   - *fp
   out:
   - *fp
+
+# VUDOT: Vd.4S += Vn.16B . Vm.16B (unsigned)
+- go: AddDotProductQuadruple
+  asm: "VUDOT"
+  in:
+  - &udotAcc
+    go: $t
+    base: uint
+    elemBits: 32
+  - &udotSrc
+    go: $u
+    base: uint
+    elemBits: 8
+  - *udotSrc
+  out:
+  - *udotAcc
+
+# VSDOT: Vd.4S += Vn.16B . Vm.16B (signed)
+- go: AddDotProductQuadruple
+  asm: "VSDOT"
+  in:
+  - &sdotAcc
+    go: $t
+    base: int
+    elemBits: 32
+  - &sdotSrc
+    go: $u
+    base: int
+    elemBits: 8
+  - *sdotSrc
+  out:
+  - *sdotAcc
+
+# VUSDOT: Vd.4S += Vn.16B (unsigned) . Vm.16B (signed)
+- go: AddDotProductQuadrupleMixed
+  asm: "VUSDOT"
+  in:
+  - *sdotAcc
+  - go: $v
+    base: int
+    elemBits: 8
+    overwriteBase: uint
+  - *sdotSrc
+  out:
+  - *sdotAcc

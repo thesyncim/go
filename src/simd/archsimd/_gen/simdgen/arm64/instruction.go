@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	resultInArg0Re     = regexp.MustCompile(`= V\{[^}]*\}\(d\)`)        // pseudocode reading dest register
+	resultInArg0Re     = regexp.MustCompile(`= V?\{[^}]*\}\(d\)`)       // pseudocode reading dest register; the V accessor may be a link, which xmlspec drops
 	floatPatternRe     = regexp.MustCompile(`-?(?:half|single|double)`) // docvar float type detection
 	fixedArrangementRe = regexp.MustCompile(`\.(\d+[BHSD])`)            // hardcoded arrangements like .16B, .4S
 	arngSymbolRe       = regexp.MustCompile(`\.<(T[a-z]*)>`)            // arrangement symbols like <T>, <Ta>, <Tb>
@@ -78,6 +78,7 @@ const (
 	NarrowArngs                        // NarrowArngs signifies that the destination vector register is half the bit width of the source, used in instructions like XTN/XTN2.
 	LongArngs                          // LongArngs indicates that the destination vector register is double the bit width of the source, seen in instructions like UXTL/UXTL2.
 	WideArngs                          // WideArngs applies when the second argument vector register is half the bit width of the first argument or the result, as in UADDW.
+	DotArngs                           // DotArngs indicates that the destination elements are four times the width of the source elements, with the same total register width, as in UDOT.
 	UnsupportedArngs                   // UnsupportedArngs indicates instructions whose arrangement shape is not yet supported by simdgen.
 )
 
@@ -139,6 +140,26 @@ func (instruction *Instruction) ResultInArg0() bool {
 		}
 	}
 	return false
+}
+
+// optionalFeatures maps the mnemonics of Advanced SIMD instructions that
+// require an optional architecture feature to the archsimd.ARM64Features
+// method that reports it. Instructions not listed here are part of the
+// Advanced SIMD baseline.
+//
+// TODO: derive this from the arch_variants of the XML specification, which
+// xmlspec does not currently expose.
+var optionalFeatures = map[string]string{
+	"SDOT":  "DotProd", // FEAT_DotProd
+	"UDOT":  "DotProd", // FEAT_DotProd
+	"USDOT": "I8MM",    // FEAT_I8MM
+	"SUDOT": "I8MM",    // FEAT_I8MM
+}
+
+// CPUFeature returns the CPU feature required by the instruction beyond the
+// Advanced SIMD baseline, or "" if there is none.
+func (instruction *Instruction) CPUFeature() string {
+	return optionalFeatures[instruction.Mnemonic()]
 }
 
 // IsAlias returns true if this instruction is an alias of another instruction
@@ -357,7 +378,7 @@ func (instruction *Instruction) arrangementStrings() ([]string, ArngShape) {
 	// For WideArngs, we need only the wide-side symbol.
 	ashape = instruction.ArngShape()
 	var targetSymbol string
-	if ashape == LongArngs || ashape == NarrowArngs {
+	if ashape == LongArngs || ashape == NarrowArngs || ashape == DotArngs {
 		symbols := instruction.arrangementSymbols()
 		if len(symbols) >= 2 {
 			targetSymbol = "<" + symbols[len(symbols)-1] + ">"
@@ -418,6 +439,8 @@ func verifyNonTargetArrangements(mnemonic string, ashape ArngShape, target []str
 		switch ashape {
 		case LongArngs:
 			expectedElemBits = eb * 2
+		case DotArngs:
+			expectedElemBits = eb * 4
 		case NarrowArngs, WideArngs:
 			expectedElemBits = eb / 2
 		}
@@ -465,8 +488,28 @@ func (instruction *Instruction) regDiagramArngShape() ArngShape {
 		return NarrowArngs
 	case "SHLL":
 		return LongArngs
+	case "SDOT", "UDOT", "USDOT":
+		if instruction.isVectorDot() {
+			return DotArngs
+		}
 	}
 	return DefaultArngs
+}
+
+// isVectorDot reports whether instruction is the vector (not by-element) form
+// of an integer dot product instruction, such as UDOT <Vd>.4S, <Vn>.16B, <Vm>.16B.
+func (instruction *Instruction) isVectorDot() bool {
+	switch instruction.Mnemonic() {
+	case "SDOT", "UDOT", "USDOT":
+	default:
+		return false
+	}
+	for _, class := range instruction.Classes.Iclass {
+		if !strings.Contains(class.RegDiagram.PsName, ".asimdsame2.") {
+			return false
+		}
+	}
+	return true
 }
 
 // ArngShape returns the arrangement shape.
@@ -526,8 +569,16 @@ func (instruction *Instruction) ArngShape() ArngShape {
 		case "SADDW", "UADDW", "SSUBW", "USUBW":
 			shape = WideArngs
 
+		// DotArngs: destination elements are four times the width of the source elements.
+		// Only the vector forms are supported; the by-element forms are not.
+		case "SDOT", "UDOT", "USDOT":
+			if !instruction.isVectorDot() {
+				return UnsupportedArngs
+			}
+			shape = DotArngs
+
 		// These are not yet supported by simdgen.
-		case "USDOT", "SDOT", "UDOT", "SUDOT",
+		case "SUDOT",
 			"BFDOT", "FDOT",
 			"MLA", "MLS", "MUL", "PMUL",
 			"FCMLA", "FCADD",

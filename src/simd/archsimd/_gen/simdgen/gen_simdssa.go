@@ -256,6 +256,13 @@ func writeSIMDSSA(buffer *bytes.Buffer, ops []Operation) {
 			if kind != "" {
 				regShape += capitalizeFirst(kind) // e.g., "v11Imm" + "Narrow" = "v11ImmNarrow"
 			}
+		} else if CurrentArch().GoTypeArch == "arm64" {
+			// NEON ops whose operands have different arrangements need
+			// a helper that knows the arrangement of each operand, even
+			// if they have no hi-half variant.
+			if kind := op.widthKind(); kind != "" {
+				regShape += capitalizeFirst(kind) // e.g., "v31ResultInArg0" + "Dot"
+			}
 		}
 		registerRegShape(regShape, caseStr, op)
 		if mem == NoMem && op.hasMaskedMerging(maskType, shapeOut) {

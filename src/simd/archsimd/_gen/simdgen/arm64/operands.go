@@ -84,9 +84,15 @@ func (op *Operand) instantiate(arrangement Arrangement, ashape ArngShape, vregPo
 			op.ElemBits = arrangement.elemBits / 2
 			op.Bits = arrangement.bits
 			op.Lanes = arrangement.bits / (arrangement.elemBits / 2)
-		case ashape == LongArngs && vregPos == 0:
+		case ashape == LongArngs && (vregPos == 0 || op.Role == "original"):
 			op.ElemBits = arrangement.elemBits * 2
 			op.Bits = min(arrangement.bits*2, 128)
+			op.Lanes = arrangement.bits / op.ElemBits
+		case ashape == DotArngs && (vregPos == 0 || op.Role == "original"):
+			// The destination, and the accumulator it is read as, have
+			// elements four times the width of the source elements.
+			op.ElemBits = arrangement.elemBits * 4
+			op.Bits = arrangement.bits
 			op.Lanes = arrangement.bits / op.ElemBits
 		case ashape == WideArngs && vregPos == 2:
 			op.ElemBits = arrangement.elemBits / 2

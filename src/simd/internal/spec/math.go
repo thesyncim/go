@@ -141,6 +141,51 @@ func DivFloats[E Floats, W Width](x, y Vec[E, W]) (z Vec[E, W]) {
 	})
 }
 
+// AddDotProductQuadruple multiplies corresponding elements of y and z, sums
+// each group of four adjacent products, and adds the sums to the elements of
+// x, which are four times the size of the elements of y and z.
+//
+//	w[i] = x[i] + y[4*i]*z[4*i] + y[4*i+1]*z[4*i+1] + y[4*i+2]*z[4*i+2] + y[4*i+3]*z[4*i+3]
+//
+// The products and their sum are computed exactly as {{.xE}} values; only
+// the addition to x[i] wraps on overflow.
+//
+//specgen:require yB=xB
+//specgen:experiment
+func AddDotProductQuadruple[E int32 | uint32, W Width, yE int8 | uint8](x Vec[E, W], y, z Vec[yE, W]) (w Vec[E, W]) {
+	w = makeVec[E, W]()
+	for i := range w {
+		sum := x[i]
+		for j := 4 * i; j < 4*i+4; j++ {
+			sum += E(y[j]) * E(z[j])
+		}
+		w[i] = sum
+	}
+	return w
+}
+
+// AddDotProductQuadrupleMixed multiplies the unsigned elements of y by the
+// corresponding signed elements of z, sums each group of four adjacent
+// products, and adds the sums to the elements of x.
+//
+//	w[i] = x[i] + y[4*i]*z[4*i] + y[4*i+1]*z[4*i+1] + y[4*i+2]*z[4*i+2] + y[4*i+3]*z[4*i+3]
+//
+// The products and their sum are computed exactly as int32 values; only the
+// addition to x[i] wraps on overflow.
+//
+//specgen:experiment
+func AddDotProductQuadrupleMixed[W Width](x Vec[int32, W], y Vec[uint8, W], z Vec[int8, W]) (w Vec[int32, W]) {
+	w = makeVec[int32, W]()
+	for i := range w {
+		sum := x[i]
+		for j := 4 * i; j < 4*i+4; j++ {
+			sum += int32(y[j]) * int32(z[j])
+		}
+		w[i] = sum
+	}
+	return w
+}
+
 // DotProductPairs multiplies corresponding elements of x and y, and sums
 // adjacent pairs, returning a vector of half as many elements, each with twice
 // the input element size.

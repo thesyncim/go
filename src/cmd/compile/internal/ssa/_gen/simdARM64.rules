@@ -53,6 +53,9 @@
 (AddUint16x8 ...) => (VADD8H ...) // pureVreg
 (AddUint32x4 ...) => (VADD4S ...) // pureVreg
 (AddUint64x2 ...) => (VADD2D ...) // pureVreg
+(AddDotProductQuadrupleInt32x4 ...) => (VSDOT16B ...) // pureVreg
+(AddDotProductQuadrupleUint32x4 ...) => (VUDOT16B ...) // pureVreg
+(AddDotProductQuadrupleMixedInt32x4 ...) => (VUSDOT16B ...) // pureVreg
 (AddSaturatedInt8x16 ...) => (VSQADD16B ...) // pureVreg
 (AddSaturatedInt16x8 ...) => (VSQADD8H ...) // pureVreg
 (AddSaturatedInt32x4 ...) => (VSQADD4S ...) // pureVreg

@@ -660,6 +660,15 @@ func RewriteValue(v *ssa.Value) bool {
 	case ssaop.OpAdd8:
 		v.Op = ssaop.OpARM64ADD
 		return true
+	case ssaop.OpAddDotProductQuadrupleInt32x4:
+		v.Op = ssaop.OpARM64VSDOT16B
+		return true
+	case ssaop.OpAddDotProductQuadrupleMixedInt32x4:
+		v.Op = ssaop.OpARM64VUSDOT16B
+		return true
+	case ssaop.OpAddDotProductQuadrupleUint32x4:
+		v.Op = ssaop.OpARM64VUDOT16B
+		return true
 	case ssaop.OpAddFloat32s:
 		v.Op = ssaop.OpARM64ZFADDS
 		return true

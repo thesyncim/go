@@ -897,3 +897,19 @@ func sveManyLiveMasksGen(a, y archsimd.Float32s, c0, c1, c2, c3, c4, c5, c6, c7,
 	a = a.Abs().IfElse(m9, y)
 	return a
 }
+
+// Dot products accumulate in place into the destination register.
+func addDotProductQuadrupleUint(x archsimd.Uint32x4, y, z archsimd.Uint8x16) archsimd.Uint32x4 {
+	// arm64:`VUDOT V\d+\.B16, V\d+\.B16, V\d+\.S4` -`VADD`
+	return x.AddDotProductQuadruple(y, z)
+}
+
+func addDotProductQuadrupleInt(x archsimd.Int32x4, y, z archsimd.Int8x16) archsimd.Int32x4 {
+	// arm64:`VSDOT V\d+\.B16, V\d+\.B16, V\d+\.S4` -`VADD`
+	return x.AddDotProductQuadruple(y, z)
+}
+
+func addDotProductQuadrupleMixed(x archsimd.Int32x4, y archsimd.Uint8x16, z archsimd.Int8x16) archsimd.Int32x4 {
+	// arm64:`VUSDOT V\d+\.B16, V\d+\.B16, V\d+\.S4` -`VADD`
+	return x.AddDotProductQuadrupleMixed(y, z)
+}

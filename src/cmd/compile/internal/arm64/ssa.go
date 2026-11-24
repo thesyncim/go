@@ -589,6 +589,28 @@ func simdV21Long2(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
 	return p
 }
 
+// simdV31ResultInArg0Dot generates a destructive dot product instruction,
+// e.g. UDOT V2.16B, V1.16B, V0.4S. The destination elements are four times
+// the size of the source elements.
+func simdV31ResultInArg0Dot(s *ssagen.State, v *ssa.Value, arrangement int16) *obj.Prog {
+	var dst int16
+	switch arrangement {
+	case arm64.ARNG_16B:
+		dst = arm64.ARNG_4S
+	case arm64.ARNG_8B:
+		dst = arm64.ARNG_2S
+	default:
+		panic("simdV31ResultInArg0Dot: bad arrangement")
+	}
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = simdRegArng(v.Args[2].Reg(), arrangement)
+	p.Reg = simdRegArng(v.Args[1].Reg(), arrangement)
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = simdRegArng(v.Reg(), dst)
+	return p
+}
+
 func ssaGenValue(s *ssagen.State, v *ssa.Value) {
 	switch v.Op {
 	case ssaop.OpCopy, ssaop.OpARM64MOVDreg:

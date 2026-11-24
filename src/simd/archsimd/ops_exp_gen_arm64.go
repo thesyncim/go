@@ -4,6 +4,46 @@
 
 package archsimd
 
+/* AddDotProductQuadruple */
+
+// AddDotProductQuadruple multiplies corresponding elements of y and z, sums
+// each group of four adjacent products, and adds the sums to the elements of
+// x, which are four times the size of the elements of y and z.
+//
+//	w[i] = x[i] + y[4*i]*z[4*i] + y[4*i+1]*z[4*i+1] + y[4*i+2]*z[4*i+2] + y[4*i+3]*z[4*i+3]
+//
+// The products and their sum are computed exactly as int32 values; only
+// the addition to x[i] wraps on overflow.
+//
+// Asm: VSDOT, CPU Feature: DotProd
+func (x Int32x4) AddDotProductQuadruple(y Int8x16, z Int8x16) (w Int32x4)
+
+// AddDotProductQuadruple multiplies corresponding elements of y and z, sums
+// each group of four adjacent products, and adds the sums to the elements of
+// x, which are four times the size of the elements of y and z.
+//
+//	w[i] = x[i] + y[4*i]*z[4*i] + y[4*i+1]*z[4*i+1] + y[4*i+2]*z[4*i+2] + y[4*i+3]*z[4*i+3]
+//
+// The products and their sum are computed exactly as uint32 values; only
+// the addition to x[i] wraps on overflow.
+//
+// Asm: VUDOT, CPU Feature: DotProd
+func (x Uint32x4) AddDotProductQuadruple(y Uint8x16, z Uint8x16) (w Uint32x4)
+
+/* AddDotProductQuadrupleMixed */
+
+// AddDotProductQuadrupleMixed multiplies the unsigned elements of y by the
+// corresponding signed elements of z, sums each group of four adjacent
+// products, and adds the sums to the elements of x.
+//
+//	w[i] = x[i] + y[4*i]*z[4*i] + y[4*i+1]*z[4*i+1] + y[4*i+2]*z[4*i+2] + y[4*i+3]*z[4*i+3]
+//
+// The products and their sum are computed exactly as int32 values; only the
+// addition to x[i] wraps on overflow.
+//
+// Asm: VUSDOT, CPU Feature: I8MM
+func (x Int32x4) AddDotProductQuadrupleMixed(y Uint8x16, z Int8x16) (w Int32x4)
+
 /* LeadingSignBits */
 
 // LeadingSignBits counts the leading sign bits of each element in x.

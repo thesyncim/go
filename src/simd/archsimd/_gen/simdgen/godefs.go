@@ -103,9 +103,25 @@ func (o *Operation) hiHalfKind() string {
 	if o.HiHalfAsm == nil {
 		return ""
 	}
-	// Find the first vreg input and the first vreg output to compare elemBits.
+	if kind := o.widthKind(); kind != "dot" {
+		return kind
+	}
+	return ""
+}
+
+// widthKind classifies how the element width of o's vector result relates to
+// that of its vector inputs: "narrow" if the result elements are narrower,
+// "dot" if they are four times as wide (as in UDOT), "long" if they are
+// otherwise wider, and "" if they are the same width. An accumulator input,
+// which is also the result (see [OneVregOutAtIn]), is ignored.
+func (o *Operation) widthKind() string {
+	// Find the first non-accumulator vreg input and the first vreg output
+	// to compare elemBits.
 	var inElemBits, outElemBits *int
 	for i := range o.In {
+		if o.In[i].Class == "vreg" && o.In[i].AsmPos == 0 {
+			continue // accumulator
+		}
 		if o.In[i].Class == "vreg" && o.In[i].ElemBits != nil {
 			inElemBits = o.In[i].ElemBits
 			break
@@ -122,6 +138,9 @@ func (o *Operation) hiHalfKind() string {
 	}
 	if *outElemBits < *inElemBits {
 		return "narrow"
+	}
+	if *outElemBits == 4**inElemBits {
+		return "dot"
 	}
 	if *outElemBits > *inElemBits {
 		return "long"

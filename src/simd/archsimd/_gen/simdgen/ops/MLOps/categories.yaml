@@ -20,6 +20,15 @@
   noGenericOps: "true"
   documentation: !string |-
     // NAME performs dot products on pairs of elements of y and z and then adds x.
+- go: AddDotProductQuadruple
+  commutative: false
+  documentation: !string |-
+    // NAME performs dot products on groups of four elements of y and z and then adds x.
+- go: AddDotProductQuadrupleMixed
+  commutative: false
+  documentation: !string |-
+    // NAME performs dot products on groups of four unsigned elements of y and
+    // signed elements of z and then adds x.
 - go: MulAdd
   commutative: false
 - go: MulAddEvenSubOdd

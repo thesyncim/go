@@ -485,6 +485,11 @@ func ssaGenSIMDValue(s *ssagen.State, v *ssa.Value) bool {
 	case ssaop.OpARM64VTBX16B:
 		p = simdV31ResultInArg0List(s, v, arm64.ARNG_16B)
 
+	case ssaop.OpARM64VSDOT16B,
+		ssaop.OpARM64VUDOT16B,
+		ssaop.OpARM64VUSDOT16B:
+		p = simdV31ResultInArg0Dot(s, v, arm64.ARNG_16B)
+
 	default:
 		// Unknown reg shape
 		return false
