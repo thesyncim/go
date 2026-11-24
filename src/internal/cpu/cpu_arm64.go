@@ -21,6 +21,8 @@ func doinit() {
 		{Name: "atomics", Feature: &ARM64.HasATOMICS},
 		{Name: "cpuid", Feature: &ARM64.HasCPUID},
 		{Name: "isNeoverse", Feature: &ARM64.IsNeoverse},
+		{Name: "asimddp", Feature: &ARM64.HasASIMDDP},
+		{Name: "i8mm", Feature: &ARM64.HasI8MM},
 	}
 
 	// arm64 uses different ways to detect CPU features at runtime depending on the operating system.
@@ -78,9 +80,21 @@ func parseARM64SystemRegisters(isar0, isa1, pfr0 uint64) {
 		ARM64.HasSHA3 = true
 	}
 
+	switch extractBits(isar0, 44, 47) {
+	case 1:
+		ARM64.HasASIMDDP = true
+	}
+
+	// ID_AA64ISAR1_EL1
+	// https://developer.arm.com/documentation/ddi0601/2025-03/AArch64-Registers/ID-AA64ISAR1-EL1--AArch64-Instruction-Set-Attribute-Register-1
 	switch extractBits(isa1, 36, 39) {
 	case 1:
 		ARM64.HasSB = true
+	}
+
+	switch extractBits(isa1, 52, 55) {
+	case 1:
+		ARM64.HasI8MM = true
 	}
 
 	switch extractBits(pfr0, 32, 35) {

@@ -36,12 +36,14 @@ const (
 	hwcap_ATOMICS = 1 << 8
 	hwcap_CPUID   = 1 << 11
 	hwcap_SHA3    = 1 << 17
+	hwcap_ASIMDDP = 1 << 20
 	hwcap_SHA512  = 1 << 21
 	hwcap_SVE     = 1 << 22
 	hwcap_DIT     = 1 << 24
 	hwcap_SB      = 1 << 29
 
 	hwcap2_SVE2 = 1 << 1
+	hwcap2_I8MM = 1 << 13
 )
 
 func hwcapInit(os string) {
@@ -61,6 +63,8 @@ func hwcapInit(os string) {
 	ARM64.HasSB = isSet(HWCap, hwcap_SB)
 	ARM64.HasSVE = isSet(HWCap, hwcap_SVE)
 	ARM64.HasSVE2 = isSet(HWCap2, hwcap2_SVE2)
+	ARM64.HasASIMDDP = isSet(HWCap, hwcap_ASIMDDP)
+	ARM64.HasI8MM = isSet(HWCap2, hwcap2_I8MM)
 
 	// The Samsung S9+ kernel reports support for atomics, but not all cores
 	// actually support them, resulting in SIGILL. See issue #28431.
