@@ -184,3 +184,38 @@ func TestShiftRightNarrow(t *testing.T) {
 		return true
 	})
 }
+
+// TestExtendShiftLeft tests x.ExtendTo*().ShiftAllLeft(c), which compiles to
+// a single USHLL, USHLL2, SSHLL or SSHLL2 for c smaller than the source
+// element width.
+func TestExtendShiftLeft(t *testing.T) {
+	forSlice(t, uint8s, 16, func(x []uint8) bool {
+		t.Helper()
+		v := archsimd.LoadUint8x16(x)
+		lo, hi, big := make([]uint16, 8), make([]uint16, 8), make([]uint16, 8)
+		v.ExtendToUint16().ShiftAllLeft(7).Store(lo)
+		v.HiToLo().ExtendToUint16().ShiftAllLeft(1).Store(hi)
+		v.ExtendToUint16().ShiftAllLeft(8).Store(big)
+		for i := range 8 {
+			if lo[i] != uint16(x[i])<<7 || hi[i] != uint16(x[8+i])<<1 || big[i] != uint16(x[i])<<8 {
+				t.Errorf("x=%v: got %v %v %v", x, lo, hi, big)
+				return false
+			}
+		}
+		return true
+	})
+	forSlice(t, int16s, 8, func(x []int16) bool {
+		t.Helper()
+		v := archsimd.LoadInt16x8(x)
+		lo, hi := make([]int32, 4), make([]int32, 4)
+		v.ExtendToInt32().ShiftAllLeft(15).Store(lo)
+		v.HiToLo().ExtendToInt32().ShiftAllLeft(4).Store(hi)
+		for i := range 4 {
+			if lo[i] != int32(x[i])<<15 || hi[i] != int32(x[4+i])<<4 {
+				t.Errorf("x=%v: got %v %v", x, lo, hi)
+				return false
+			}
+		}
+		return true
+	})
+}

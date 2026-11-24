@@ -214,10 +214,15 @@
 # sequences.
 
 # Integer extend (widen) — signed
+# x.ExtendTo*().ShiftAllLeft(c) fuses into VSSHLL (or VUSHLL for unsigned
+# extends) for shifts smaller than the source element width.
 # int8 -> int16
 - go: ExtendToInt16
   asm: "VSXTL"
   hiHalfAsm: "VSXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VSSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VSXTL2_%a x)) && uint64(c) < %b => (VSSHLL2_%a [c] x)"
   in:
     - base: int
       elemBits: 8
@@ -230,6 +235,9 @@
 - go: ExtendToInt32
   asm: "VSXTL"
   hiHalfAsm: "VSXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VSSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VSXTL2_%a x)) && uint64(c) < %b => (VSSHLL2_%a [c] x)"
   in:
     - base: int
       elemBits: 16
@@ -242,6 +250,9 @@
 - go: ExtendToInt64
   asm: "VSXTL"
   hiHalfAsm: "VSXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VSSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VSXTL2_%a x)) && uint64(c) < %b => (VSSHLL2_%a [c] x)"
   in:
     - base: int
       elemBits: 32
@@ -255,6 +266,9 @@
 - go: ExtendToUint16
   asm: "VUXTL"
   hiHalfAsm: "VUXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VUSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VUXTL2_%a x)) && uint64(c) < %b => (VUSHLL2_%a [c] x)"
   in:
     - base: uint
       elemBits: 8
@@ -267,6 +281,9 @@
 - go: ExtendToUint32
   asm: "VUXTL"
   hiHalfAsm: "VUXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VUSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VUXTL2_%a x)) && uint64(c) < %b => (VUSHLL2_%a [c] x)"
   in:
     - base: uint
       elemBits: 16
@@ -279,6 +296,9 @@
 - go: ExtendToUint64
   asm: "VUXTL"
   hiHalfAsm: "VUXTL2"
+  peepholeRules:
+  - !string "(VSHL%w [c] (%h x)) && uint64(c) < %b => (VUSHLL%a [c] x)"
+  - !string "(VSHL%w [c] (VUXTL2_%a x)) && uint64(c) < %b => (VUSHLL2_%a [c] x)"
   in:
     - base: uint
       elemBits: 32

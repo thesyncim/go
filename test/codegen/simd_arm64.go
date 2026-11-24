@@ -1025,3 +1025,21 @@ func shiftAllRightRoundedSaturateUint(x archsimd.Uint32x4) archsimd.Uint16x8 {
 	// arm64:`VUQRSHRN [$]5, V\d+\.S4, V\d+\.H4` -`VUQXTN` -`VURSHR`
 	return x.ShiftAllRightRounded(5).SaturateToUint16()
 }
+
+// A left shift of an extended value fuses into the shift left long
+// instructions.
+func extendShiftLeft(x archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUSHLL [$]3, V\d+\.B8, V\d+\.H8` -`VUXTL` -`VSHL\s`
+	return x.ExtendToUint16().ShiftAllLeft(3)
+}
+
+func extendShiftLeftHi(x archsimd.Int16x8) archsimd.Int32x4 {
+	// arm64:`VSSHLL2 [$]15, V\d+\.H8, V\d+\.S4` -`VSXTL` -`VSHL\s`
+	return x.HiToLo().ExtendToInt32().ShiftAllLeft(15)
+}
+
+// The shift is too large for VUSHLL.
+func extendShiftLeftNoFusion(x archsimd.Uint8x16) archsimd.Uint16x8 {
+	// arm64:`VUXTL` `VSHL [$]8` -`VUSHLL`
+	return x.ExtendToUint16().ShiftAllLeft(8)
+}
